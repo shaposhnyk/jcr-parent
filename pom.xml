@@ -6,10 +6,12 @@
 
     <groupId>javax.jcr.api</groupId>
     <artifactId>jcr-parent</artifactId>
+    <packaging>pom</packaging>
     <version>0.1.0-SNAPSHOT</version>
 
     <modules>
         <module>api-core-level1</module>
+        <module>jcr-level1-json-jackson-adapter</module>
     </modules>
 
     <name>JCR V3. Light-weight modular JCR API</name>
