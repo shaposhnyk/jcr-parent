@@ -3,7 +3,6 @@
  */
 package javax.jcr.api;
 
-import javax.jcr.api.definitions.PropertyType;
 import javax.jcr.api.definitions.StandardPropertyTypes;
 import javax.jcr.api.exceptions.RepositoryException;
 import javax.jcr.api.exceptions.UnsupportedRepositoryOperationException;

@@ -3,8 +3,7 @@
  */
 package javax.jcr.api;
 
-import javax.jcr.api.definitions.NodeType;
-import javax.jcr.api.definitions.PropertyDefinition;
+import javax.jcr.api.definitions.TypeDefinition;
 import javax.jcr.api.exceptions.RepositoryException;
 import javax.jcr.api.exceptions.ValueFormatException;
 import java.util.stream.Stream;
@@ -52,11 +51,10 @@ public interface ImmutableProperty extends ImmutableItem, ImmutableValue {
      * which may have been applicable is an implementation issue and is not
      * covered by this specification.
      *
-     * @return a <code>PropertyDefinition</code> object.
+     * @return a <code>TypeDefinition</code> object.
      * @throws RepositoryException if an error occurs.
-     * @see NodeType#getPropertyDefinitions
      */
-    default PropertyDefinition getDefinition() {
+    default TypeDefinition getDefinition() {
         return null;
     }
 }

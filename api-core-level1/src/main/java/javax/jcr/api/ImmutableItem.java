@@ -1,7 +1,7 @@
 package javax.jcr.api;
 
 
-import javax.jcr.api.definitions.NodeTypeDefinition;
+import javax.jcr.api.definitions.TypeDefinition;
 import javax.jcr.api.exceptions.PathNotFoundException;
 import javax.jcr.api.exceptions.RepositoryException;
 import java.nio.file.Path;
@@ -166,5 +166,5 @@ public interface ImmutableItem {
      * @return a <code>NodeType</code> object.
      * @throws RepositoryException if an error occurs
      */
-    NodeTypeDefinition getDefinition();
+    TypeDefinition getDefinition();
 }

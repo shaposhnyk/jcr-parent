@@ -3,8 +3,12 @@
  */
 package javax.jcr.api.definitions;
 
+import java.lang.reflect.Type;
+import java.util.Collection;
+import java.util.Collections;
+
 /**
- * The <code>NodeTypeDefinition</code> interface provides methods for
+ * The <code>TypeDefinition</code> interface provides methods for
  * discovering the static definition of a node type. These are accessible both
  * before and after the node type is registered. Its subclass
  * <code>NodeType</code> adds methods that are relevant only when the node type
@@ -17,32 +21,44 @@ package javax.jcr.api.definitions;
  *
  * @since JCR 2.0
  */
-public interface NodeTypeDefinition {
+public interface TypeDefinition {
 
     /**
      * Returns the name of the node type.
      * <p>
      * In implementations that support node type registration, if this
-     * <code>NodeTypeDefinition</code> object is actually a newly-created empty
+     * <code>TypeDefinition</code> object is actually a newly-created empty
      * <code>NodeTypeTemplate</code>, then this method will return
      * <code>null</code>.
      *
      * @return a <code>String</code>
      * @since JCR 2.0 moved here from JCR 1.0 <code>NodeType</code>.
      */
-    public String getName();
+    String getIdentifier();
+
+    /**
+     * Returns an array containing the property definitions of this node type.
+     * This includes both those property definitions actually declared in this
+     * node type and those inherited from the supertypes of this type.
+     *
+     * @return an array containing the property definitions.
+     * @see #getDeclaredPropertyDefinitions()
+     */
+    Collection<PropertyDefinition> getPropertyDefinitions();
 
     /**
      * Returns the names of the supertypes actually declared in this node type.
      * <p>
      * In implementations that support node type registration, if this
-     * <code>NodeTypeDefinition</code> object is actually a newly-created empty
+     * <code>TypeDefinition</code> object is actually a newly-created empty
      * <code>NodeTypeTemplate</code>, then this method will return an empty array.
      *
      * @return an array of <code>String</code>s
      * @since JCR 2.0
      */
-    public String[] getDeclaredSupertypeNames();
+    default Collection<String> getDeclaredSupertypeNames() {
+        return Collections.emptyList();
+    }
 
     /**
      * Returns <code>true</code> if this is an abstract node type; returns
@@ -53,28 +69,32 @@ public interface NodeTypeDefinition {
      * types as a superclass.
      * <p>
      * In implementations that support node type registration, if this
-     * <code>NodeTypeDefinition</code> object is actually a newly-created empty
+     * <code>TypeDefinition</code> object is actually a newly-created empty
      * <code>NodeTypeTemplate</code>, then this method will return
      * <code>false</code>.
      *
      * @return a <code>boolean</code>
      * @since JCR 2.0
      */
-    public boolean isAbstract();
+    default boolean isAbstract() {
+        return false;
+    }
 
     /**
      * Returns <code>true</code> if this is a mixin type; returns
      * <code>false</code> if it is primary.
      * <p>
      * In implementations that support node type registration, if this
-     * <code>NodeTypeDefinition</code> object is actually a newly-created empty
+     * <code>TypeDefinition</code> object is actually a newly-created empty
      * <code>NodeTypeTemplate</code>, then this method will return
      * <code>false</code>.
      *
      * @return a <code>boolean</code>
      * @since JCR 2.0 moved here from JCR 1.0 <code>NodeType</code>.
      */
-    public boolean isMixin();
+    default boolean isMixin() {
+        return false;
+    }
 
     /**
      * Returns <code>true</code> if nodes of this type must support orderable
@@ -88,77 +108,53 @@ public interface NodeTypeDefinition {
      * node.
      * <p>
      * In implementations that support node type registration, if this
-     * <code>NodeTypeDefinition</code> object is actually a newly-created empty
+     * <code>TypeDefinition</code> object is actually a newly-created empty
      * <code>NodeTypeTemplate</code>, then this method will return
      * <code>false</code>.
      *
      * @return a <code>boolean</code>
      * @since JCR 2.0 moved here from JCR 1.0 <code>NodeType</code>.
      */
-    public boolean hasOrderableChildNodes();
+    default boolean hasOrderableChildNodes() {
+        return false;
+    }
 
     /**
      * Returns <code>true</code> if the node type is queryable, meaning that the
      * available-query-operators, full-text-searchable and query-orderable
      * attributes of its property definitions take effect. See {@link
-     * javax.jcr.nodetype.PropertyDefinition#getAvailableQueryOperators()},
-     * {@link javax.jcr.nodetype.PropertyDefinition#isFullTextSearchable()} and
-     * {@link javax.jcr.nodetype.PropertyDefinition#isQueryOrderable()}.
+     * javax.jcr.api.definitions.PropertyDefinition#getAvailableQueryOperators()},
+     * {@link javax.jcr.api.definitions.PropertyDefinition#isFullTextSearchable()} and
+     * {@link javax.jcr.api.definitions.PropertyDefinition#isQueryOrderable()}.
      * <p>
      * If a node type is declared non-queryable then these attributes of its
      * property definitions have no effect.
      * <p>
      * In implementations that support node type registration, if this
-     * <code>NodeTypeDefinition</code> object is actually a newly-created empty
+     * <code>TypeDefinition</code> object is actually a newly-created empty
      * <code>NodeTypeTemplate</code>, then this method will return
      * an implementation-determined defalt value.
      *
      * @return a <code>boolean</code>
      * @since JCR 2.0
      */
-    public boolean isQueryable();
-
-    /**
-     * Returns the name of the primary item (one of the child items of the nodes
-     * of this node type). If this node has no primary item, then this method
-     * returns <code>null</code>. This indicator is used by the method
-     * <code>ImmutableObjectNode.getPrimaryItem()</code>.
-     * <p>
-     * In implementations that support node type registration, if this
-     * <code>NodeTypeDefinition</code> object is actually a newly-created empty
-     * <code>NodeTypeTemplate</code>, then this method will return
-     * <code>null</code>.
-     *
-     * @return a <code>String</code>
-     * @since JCR 2.0 moved here from JCR 1.0 <code>NodeType</code>.
-     */
-    public String getPrimaryItemName();
+    default boolean isQueryable() {
+        return true;
+    }
 
     /**
      * Returns an array containing the property definitions actually declared in
      * this node type.
      * <p>
      * In implementations that support node type registration, if this
-     * <code>NodeTypeDefinition</code> object is actually a newly-created empty
+     * <code>TypeDefinition</code> object is actually a newly-created empty
      * <code>NodeTypeTemplate</code>, then this method will return
      * <code>null</code>.
      *
      * @return an array of <code>PropertyDefinition</code>s
      * @since JCR 2.0 moved here from JCR 1.0 <code>NodeType</code>.
      */
-    public PropertyDefinition[] getDeclaredPropertyDefinitions();
-
-    /**
-     * Returns an array containing the child node definitions actually declared
-     * in this node type.
-     * <p>
-     * In implementations that support node type registration, if this
-     * <code>NodeTypeDefinition</code> object is actually a newly-created empty
-     * <code>NodeTypeTemplate</code>, then this method will return
-     * <code>null</code>.
-     *
-     * @return an array of <code>NodeDefinition</code>s
-     * @since JCR 2.0 moved here from JCR 1.0 <code>NodeType</code>.
-     */
-    public NodeDefinition[] getDeclaredChildNodeDefinitions();
+    default Collection<TypeDefinition> getDeclaredPropertyDefinitions() {
+        return Collections.emptyList();
+    }
 }

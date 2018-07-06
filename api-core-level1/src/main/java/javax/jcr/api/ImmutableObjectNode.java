@@ -3,7 +3,6 @@
  */
 package javax.jcr.api;
 
-import javax.jcr.api.definitions.NodeType;
 import javax.jcr.api.definitions.StandardPropertyTypes;
 import javax.jcr.api.exceptions.RepositoryException;
 import java.util.Collection;
@@ -139,7 +138,7 @@ public interface ImmutableObjectNode extends ImmutableItem {
      */
     default boolean isNodeType(String nodeTypeName) {
         return getMixinNodeTypes().stream()
-                .filter(t -> nodeTypeName.equals(t.getName()))
+                .filter(t -> nodeTypeName.equals(t.getIdentifier()))
                 .findAny()
                 .isPresent();
     }

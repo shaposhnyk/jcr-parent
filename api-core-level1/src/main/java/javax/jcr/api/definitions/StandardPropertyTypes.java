@@ -19,7 +19,7 @@ import java.util.Objects;
  */
 public final class StandardPropertyTypes {
 
-    public static final class StandardScalarType implements PropertyType {
+    public static final class StandardScalarType implements TypeDefinition {
         private final String code;
         private final int id;
 
@@ -38,11 +38,16 @@ public final class StandardPropertyTypes {
         }
 
         @Override
+        public boolean isQueryable() {
+            return false;
+        }
+
+        @Override
         public boolean equals(Object obj) {
             if (obj == this) {
                 return true;
-            } else if (obj instanceof PropertyType) {
-                return getIdentifier().equals(((PropertyType) obj).getIdentifier());
+            } else if (obj instanceof TypeDefinition) {
+                return getIdentifier().equals(((TypeDefinition) obj).getIdentifier());
             }
             return false;
         }
@@ -160,7 +165,7 @@ public final class StandardPropertyTypes {
      * ImmutableProperty#getType} and it cannot be assigned as the type when creating a
      * new property.
      */
-    public static final PropertyType UNDEFINED = new StandardScalarType(0, "undefined");
+    public static final StandardScalarType UNDEFINED = new StandardScalarType(0, "undefined");
 
     private static final List<StandardScalarType> STANDARD_TYPES = Arrays.asList(
             STRING,
