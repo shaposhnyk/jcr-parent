@@ -5,7 +5,7 @@ package javax.jcr.api.exceptions;
 
 /**
  * Exception thrown when no <code>Item</code> exists at the specified path or
- * when the specified path implies intermediary <code>ImmutableNode</code>s that do not
+ * when the specified path implies intermediary <code>ImmutableObjectNode</code>s that do not
  * exist.
  */
 public class PathNotFoundException extends RepositoryException {

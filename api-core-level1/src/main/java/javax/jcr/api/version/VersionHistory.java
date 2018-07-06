@@ -3,7 +3,7 @@
  */
 package javax.jcr.api.version;
 
-import javax.jcr.api.ImmutableNode;
+import javax.jcr.api.ImmutableObjectNode;
 import javax.jcr.api.exceptions.RepositoryException;
 import java.util.stream.Stream;
 
@@ -11,7 +11,7 @@ import java.util.stream.Stream;
  * A <code>VersionHistory</code> object wraps an <code>nt:versionHistory</code>
  * node. It provides convenient access to version history information.
  */
-public interface VersionHistory extends ImmutableNode {
+public interface VersionHistory extends ImmutableObjectNode {
 
     /**
      * Returns the identifier of the versionable node for which this is the

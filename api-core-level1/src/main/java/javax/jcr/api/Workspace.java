@@ -3,6 +3,8 @@
  */
 package javax.jcr.api;
 
+import javax.jcr.api.exceptions.RepositoryException;
+
 /**
  * A <code>Workspace</code> object represents a view onto a persitent workspace
  * within a repository. This view is defined by the authorization settings of
@@ -22,4 +24,14 @@ public interface Workspace {
      * @return the name of this workspace.
      */
     public String getName();
+
+    /**
+     * Returns the root node of the workspace, "/". This node is the main access
+     * point to the content of the workspace.
+     *
+     * @return The root node of the workspace: a <code>{@link ImmutableItem}</code>
+     * object.
+     * @throws RepositoryException if an error occurs.
+     */
+    ImmutableItem getRootNode();
 }

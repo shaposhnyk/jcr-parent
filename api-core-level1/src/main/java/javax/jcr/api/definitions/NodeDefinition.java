@@ -9,7 +9,7 @@ import java.util.Collection;
  * A node definition. Used in node type definitions.
  *
  * @see NodeType#getChildNodeDefinitions
- * @see javax.jcr.Node#getDefinition
+ * @see javax.jcr.api.ImmutableObjectNode#getDefinition
  */
 public interface NodeDefinition extends ItemDefinition {
 
@@ -35,7 +35,7 @@ public interface NodeDefinition extends ItemDefinition {
      *
      * @return an array of <code>NodeType</code> objects.
      */
-     Collection<NodeType> getRequiredPrimaryTypes();
+    Collection<NodeType> getRequiredPrimaryTypes();
 
     /**
      * Returns the names of the required primary node types.
@@ -73,7 +73,7 @@ public interface NodeDefinition extends ItemDefinition {
      *
      * @return a <code>NodeType</code>.
      */
-     NodeType getDefaultPrimaryType();
+    NodeType getDefaultPrimaryType();
 
     /**
      * Returns the name of the default primary node type.
@@ -91,7 +91,7 @@ public interface NodeDefinition extends ItemDefinition {
      * @return a String
      * @since JCR 2.0
      */
-     String getDefaultPrimaryTypeName();
+    String getDefaultPrimaryTypeName();
 
     /**
      * Reports whether this child node can have same-name siblings. In other
@@ -106,5 +106,5 @@ public interface NodeDefinition extends ItemDefinition {
      *
      * @return a boolean.
      */
-     boolean allowsSameNameSiblings();
+    boolean allowsSameNameSiblings();
 }

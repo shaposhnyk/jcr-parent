@@ -121,8 +121,8 @@ public interface ItemDefinition {
      * Reports whether the child item is protected. In level 2 implementations,
      * a protected item is one that cannot be removed (except by removing its
      * parent) or modified through the the standard write methods of this API
-     * (that is, <code>ImmutableItem.remove</code>, <code>ImmutableNode.addNode</code>,
-     * <code>ImmutableNode.setProperty</code> and <code>ImmutableProperty.setValue</code>).
+     * (that is, <code>ImmutableItem.remove</code>, <code>ImmutableObjectNode.addNode</code>,
+     * <code>ImmutableObjectNode.setProperty</code> and <code>ImmutableProperty.setValue</code>).
      * <p>
      * A protected node may be removed or modified (in a level 2
      * implementation), however, through some mechanism not defined by this

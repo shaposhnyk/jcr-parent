@@ -80,9 +80,9 @@ public interface NodeTypeDefinition {
      * Returns <code>true</code> if nodes of this type must support orderable
      * child nodes; returns <code>false</code> otherwise. If a node type returns
      * <code>true</code> on a call to this method, then all nodes of that node
-     * type <i>must</i> support the method <code>ImmutableNode.orderBefore</code>. If a
+     * type <i>must</i> support the method <code>ImmutableObjectNode.orderBefore</code>. If a
      * node type returns <code>false</code> on a call to this method, then nodes
-     * of that node type <i>may</i> support <code>ImmutableNode.orderBefore</code>. Only
+     * of that node type <i>may</i> support <code>ImmutableObjectNode.orderBefore</code>. Only
      * the primary node type of a node controls that node's status in this
      * regard. This setting on a mixin node type will not have any effect on the
      * node.
@@ -122,7 +122,7 @@ public interface NodeTypeDefinition {
      * Returns the name of the primary item (one of the child items of the nodes
      * of this node type). If this node has no primary item, then this method
      * returns <code>null</code>. This indicator is used by the method
-     * <code>ImmutableNode.getPrimaryItem()</code>.
+     * <code>ImmutableObjectNode.getPrimaryItem()</code>.
      * <p>
      * In implementations that support node type registration, if this
      * <code>NodeTypeDefinition</code> object is actually a newly-created empty

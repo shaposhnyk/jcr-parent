@@ -3,11 +3,14 @@
  */
 package javax.jcr.api;
 
+import javax.jcr.api.definitions.PropertyType;
+import javax.jcr.api.definitions.StandardPropertyTypes;
 import javax.jcr.api.exceptions.RepositoryException;
 import javax.jcr.api.exceptions.UnsupportedRepositoryOperationException;
-import java.io.InputStream;
+import javax.jcr.api.exceptions.ValueFormatException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
@@ -16,7 +19,7 @@ import java.time.format.DateTimeParseException;
  * be used without knowing the actual property type (<code>STRING</code>,
  * <code>DOUBLE</code>, <code>BINARY</code> etc.).
  * <p>
- * The <code>Binary</code> interface and its related methods in
+ * The <code>ImmutableBinaryValue</code> interface and its related methods in
  * <code>ImmutableProperty</code>, <code>ImmutableValue</code> and <code>ValueFactory</code>
  * replace the deprecated <code>ImmutableValue.getStream</code> and
  * <code>ImmutableProperty.getStream</code> methods from JCR 1.0. However, though
@@ -80,34 +83,6 @@ public interface ImmutableValue {
     String getString() throws IllegalStateException;
 
     /**
-     * Returns an <code>InputStream</code> representation of this value. Uses
-     * the standard conversion to binary (see JCR specification).
-     * <p>
-     * It is the responsibility of the caller to close the returned
-     * <code>InputStream</code>.
-     *
-     * @return An <code>InputStream</code> representation of this value.
-     * @throws RepositoryException if an error occurs.
-     * @deprecated As of JCR 2.0, {@link #getBinary()} should be used instead.
-     */
-    default InputStream getStream() {
-        throw new UnsupportedRepositoryOperationException();
-    }
-
-    /**
-     * Returns a <code>Binary</code> representation of this value. The {@link
-     * Binary} object in turn provides methods to access the binary data itself.
-     * Uses the standard conversion to binary (see JCR specification).
-     *
-     * @return A <code>Binary</code> representation of this value.
-     * @throws RepositoryException if an error occurs.
-     * @since JCR 2.0
-     */
-    default Binary getBinary() {
-        throw new UnsupportedRepositoryOperationException();
-    }
-
-    /**
      * Returns a <code>long</code> representation of this value.
      *
      * @return A <code>long</code> representation of this value.
@@ -136,8 +111,8 @@ public interface ImmutableValue {
      *
      * @return A <code>BigDecimal</code> representation of this value.
      * @throws NumberFormatException if conversion to a <code>BigDecimal</code>
-     *                              is not possible.
-     * @throws RepositoryException  if another error occurs.
+     *                               is not possible.
+     * @throws RepositoryException   if another error occurs.
      * @since JCR 2.0
      */
     default BigDecimal getDecimal() throws NumberFormatException {
@@ -160,6 +135,22 @@ public interface ImmutableValue {
     }
 
     /**
+     * Returns a <code>Calendar</code> representation of this value.
+     * <p>
+     * The object returned is a copy of the stored value, so changes to it are
+     * not reflected in internal storage.
+     *
+     * @return A <code>Calendar</code> representation of this value.
+     * @throws DateTimeParseException if conversion to a <code>Calendar</code> is
+     *                                not possible.
+     * @throws RepositoryException    if another error occurs.
+     */
+    default LocalDateTime getDateTime() {
+        return LocalDateTime.parse(getString(), DateTimeFormatter.ISO_DATE_TIME);
+    }
+
+
+    /**
      * Returns a <code>Boolean</code> representation of this value.
      *
      * @return A <code>Boolean</code> representation of this value.
@@ -167,6 +158,10 @@ public interface ImmutableValue {
      */
     default boolean getBoolean() {
         return Boolean.valueOf(getString());
+    }
+
+    default ImmutableBinaryValue getBinaryValue() {
+        throw new UnsupportedRepositoryOperationException();
     }
 
     /**
@@ -184,7 +179,7 @@ public interface ImmutableValue {
      *
      * @return an int
      */
-    default int getType() {
-        return PropertyType.STRING;
+    default PropertyType getType() {
+        return StandardPropertyTypes.STRING;
     }
 }

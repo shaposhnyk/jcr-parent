@@ -5,6 +5,7 @@ package javax.jcr.api;
 
 import javax.jcr.api.exceptions.*;
 import javax.security.auth.login.LoginException;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -77,11 +78,13 @@ interface Session {
      * Returns the root node of the workspace, "/". This node is the main access
      * point to the content of the workspace.
      *
-     * @return The root node of the workspace: a <code>{@link ImmutableNode}</code>
+     * @return The root node of the workspace: a <code>{@link ImmutableObjectNode}</code>
      * object.
      * @throws RepositoryException if an error occurs.
      */
-    ImmutableNode getRootNode();
+    default ImmutableItem getRootNode() {
+        return getWorkspace().getRootNode();
+    }
 
     /**
      * Returns a new session in accordance with the specified (new) Credentials.
@@ -110,14 +113,14 @@ interface Session {
      * referenceable and non-referenceable nodes.
      *
      * @param id An identifier.
-     * @return A <code>ImmutableNode</code>.
+     * @return A <code>ImmutableObjectNode</code>.
      * @throws ItemNotFoundException if no node with the specified identifier
      *                               exists or if this <code>Session<code> does not have read access to the
      *                               node with the specified identifier.
      * @throws RepositoryException   if another error occurs.
      * @since JCR 2.0
      */
-    ImmutableNode getNodeByIdentifier(String id) throws ItemNotFoundException;
+    ImmutableObjectNode getNodeByIdentifier(String id) throws ItemNotFoundException;
 
     /**
      * Returns the node at the specified absolute path in the workspace. If no
@@ -136,22 +139,22 @@ interface Session {
      *                               specified path.
      * @throws RepositoryException   if another error occurs.
      */
-    ImmutableItem getItem(String absPath) throws PathNotFoundException;
+    ImmutableItem getItem(Path absPath) throws PathNotFoundException;
 
     /**
      * Returns the node at the specified absolute path in the workspace.
      *
      * @param absPath An absolute path.
-     * @return the specified <code>ImmutableNode</code>.
+     * @return the specified <code>ImmutableObjectNode</code>.
      * @throws PathNotFoundException If no accessible node is found at the
      *                               specifed path.
      * @throws RepositoryException   If another error occurs.
      * @since JCR 2.0
      */
-    default ImmutableNode getNode(String absPath) throws PathNotFoundException {
+    default ImmutableObjectNode getNode(Path absPath) throws PathNotFoundException {
         ImmutableItem item = getItem(absPath);
-        if (item instanceof ImmutableNode) {
-            return (ImmutableNode) item;
+        if (item instanceof ImmutableObjectNode) {
+            return (ImmutableObjectNode) item;
         }
         throw new RepositoryException();
     }
@@ -166,7 +169,7 @@ interface Session {
      * @throws RepositoryException   if another error occurs.
      * @since JCR 2.0
      */
-    default ImmutableProperty getProperty(String absPath) throws PathNotFoundException {
+    default ImmutableProperty getProperty(Path absPath) throws PathNotFoundException {
         ImmutableItem item = getItem(absPath);
         if (item instanceof ImmutableProperty) {
             return (ImmutableProperty) item;
@@ -184,7 +187,7 @@ interface Session {
      * @throws RepositoryException if <code>absPath</code> is not a well-formed
      *                             absolute path.
      */
-    default boolean itemExists(String absPath) {
+    default boolean itemExists(Path absPath) {
         return getItem(absPath) != null;
     }
 
@@ -199,7 +202,7 @@ interface Session {
      *                             absolute path.
      * @since JCR 2.0
      */
-    default boolean nodeExists(String absPath) {
+    default boolean nodeExists(Path absPath) {
         return getNode(absPath) != null;
     }
 
@@ -214,7 +217,7 @@ interface Session {
      *                             absolute path.
      * @since JCR 2.0
      */
-    default boolean propertyExists(String absPath) {
+    default boolean propertyExists(Path absPath) {
         return getProperty(absPath) != null;
     }
 
@@ -234,7 +237,9 @@ interface Session {
      * @param keepChanges a boolean
      * @throws RepositoryException if an error occurs.
      */
-    void refresh(boolean keepChanges);
+    default void refresh(boolean keepChanges) {
+        throw new UnsupportedRepositoryOperationException();
+    }
 
     /**
      * Returns all prefixes currently mapped to URIs in this

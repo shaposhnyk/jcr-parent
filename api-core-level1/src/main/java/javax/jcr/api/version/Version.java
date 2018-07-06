@@ -3,7 +3,7 @@
  */
 package javax.jcr.api.version;
 
-import javax.jcr.api.ImmutableNode;
+import javax.jcr.api.ImmutableObjectNode;
 import javax.jcr.api.exceptions.RepositoryException;
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -12,7 +12,7 @@ import java.util.Collection;
  * A <code>Version</code> object wraps an <code>nt:version</code> node. It
  * provides convenient access to version information.
  */
-public interface Version extends ImmutableNode {
+public interface Version extends ImmutableObjectNode {
 
     /**
      * Returns the <code>VersionHistory</code> that contains this
