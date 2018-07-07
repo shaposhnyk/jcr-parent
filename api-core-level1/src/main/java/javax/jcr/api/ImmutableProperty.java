@@ -54,7 +54,7 @@ public interface ImmutableProperty extends ImmutableItem, ImmutableValue {
      * @return a <code>TypeDefinition</code> object.
      * @throws RepositoryException if an error occurs.
      */
-    default TypeDefinition getDefinition() {
+    default TypeDefinition getTypeDefinition() {
         return null;
     }
 }

@@ -105,12 +105,16 @@ public interface ImmutableItem {
         return 0;
     }
 
-    default ImmutableArrayNode asArrayNode() {
+    default ImmutableArrayNode asArray() {
         return (ImmutableArrayNode) this;
     }
 
-    default ImmutableObjectNode asNode() {
+    default ImmutableObjectNode asObject() {
         return (ImmutableObjectNode) this;
+    }
+
+    default ImmutableProperty asProperty() {
+        return (ImmutableProperty) this;
     }
 
     /**
@@ -166,5 +170,5 @@ public interface ImmutableItem {
      * @return a <code>NodeType</code> object.
      * @throws RepositoryException if an error occurs
      */
-    TypeDefinition getDefinition();
+    TypeDefinition getTypeDefinition();
 }

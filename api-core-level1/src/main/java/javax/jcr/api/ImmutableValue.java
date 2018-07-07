@@ -4,6 +4,7 @@
 package javax.jcr.api;
 
 import javax.jcr.api.definitions.StandardPropertyTypes;
+import javax.jcr.api.definitions.TypeDefinition;
 import javax.jcr.api.exceptions.RepositoryException;
 import javax.jcr.api.exceptions.UnsupportedRepositoryOperationException;
 import javax.jcr.api.exceptions.ValueFormatException;
@@ -171,14 +172,13 @@ public interface ImmutableValue {
      * <li><code>PropertyType.LONG</code></li> <li><code>PropertyType.BOOLEAN</code></li>
      * <li><code>PropertyType.NAME</code></li> <li><code>PropertyType.PATH</code></li>
      * <li><code>PropertyType.REFERENCE</code></li> <li><code>PropertyType.WEAKREFERENCE</code></li>
-     * <li><code>PropertyType.URI</code></li></ul> See <code>{@link
-     * PropertyType}</code>.
+     * <li><code>PropertyType.URI</code></li></ul> See <code>{@link TypeDefinition}</code>.
      * <p>
      * The type returned is that which was set at property creation.
      *
      * @return an int
      */
-    default PropertyType getType() {
-        return StandardPropertyTypes.STRING;
+    default TypeDefinition getTypeDefinition() {
+        return StandardPropertyTypes.UNDEFINED;
     }
 }

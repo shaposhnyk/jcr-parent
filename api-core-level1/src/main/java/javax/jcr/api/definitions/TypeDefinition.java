@@ -44,7 +44,9 @@ public interface TypeDefinition {
      * @return an array containing the property definitions.
      * @see #getDeclaredPropertyDefinitions()
      */
-    Collection<PropertyDefinition> getPropertyDefinitions();
+    default Collection<PropertyDefinition> getPropertyDefinitions() {
+        return Collections.emptyList();
+    }
 
     /**
      * Returns the names of the supertypes actually declared in this node type.

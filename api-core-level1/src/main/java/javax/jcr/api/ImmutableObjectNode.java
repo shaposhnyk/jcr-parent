@@ -4,6 +4,7 @@
 package javax.jcr.api;
 
 import javax.jcr.api.definitions.StandardPropertyTypes;
+import javax.jcr.api.definitions.TypeDefinition;
 import javax.jcr.api.exceptions.RepositoryException;
 import java.util.Collection;
 import java.util.Collections;
@@ -15,6 +16,18 @@ import java.util.stream.Stream;
  * The <code>ImmutableObjectNode</code> interface represents a read-only node in a workspace.
  */
 public interface ImmutableObjectNode extends ImmutableItem {
+
+    /**
+     * Returns the identifier of this node.
+     * Applies to both referenceable and non-referenceable nodes.
+     * <p>
+     * A <code>RepositoryException</code> is thrown if an error occurs.
+     *
+     * @return the identifier of this node.
+     * @throws RepositoryException if an error occurs.
+     * @since JCR 2.0
+     */
+    String getIdentifier();
 
     default Stream<String> getItemNames() {
         return getItems()
@@ -33,6 +46,11 @@ public interface ImmutableObjectNode extends ImmutableItem {
                 .map(i -> (ImmutableProperty) i);
     }
 
+    @Override
+    default boolean isObjectNode() {
+        return true;
+    }
+
     /**
      * Returns all child nodes of this node accessible through the current
      * <code>Session</code>. Does <i>not</i> include properties of this
@@ -49,18 +67,6 @@ public interface ImmutableObjectNode extends ImmutableItem {
     }
 
     /**
-     * Returns the identifier of this node.
-     * Applies to both referenceable and non-referenceable nodes.
-     * <p>
-     * A <code>RepositoryException</code> is thrown if an error occurs.
-     *
-     * @return the identifier of this node.
-     * @throws RepositoryException if an error occurs.
-     * @since JCR 2.0
-     */
-    String getIdentifier();
-
-    /**
      * This method returns all <code>REFERENCE</code> properties that refer to
      * this node and that are accessible through the current
      * <code>Session</code>. Equivalent to <code>ImmutableObjectNode.getReferences(null)</code>.
@@ -73,7 +79,7 @@ public interface ImmutableObjectNode extends ImmutableItem {
      */
     default Stream<ImmutableProperty> getReferences() {
         return getProperties()
-                .filter(p -> StandardPropertyTypes.REFERENCE.equals(p.getType()));
+                .filter(p -> StandardPropertyTypes.REFERENCE.equals(p.getTypeDefinition()));
     }
 
     /**
@@ -119,7 +125,7 @@ public interface ImmutableObjectNode extends ImmutableItem {
      * @return an array of  <code>NodeType</code> objects.
      * @throws RepositoryException if an error occurs
      */
-    default Collection<NodeType> getMixinNodeTypes() {
+    default Collection<TypeDefinition> getMixinNodeTypes() {
         return Collections.emptyList();
     }
 
