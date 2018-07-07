@@ -13,7 +13,8 @@
         <module>api-core-level1</module>
         <module>jcr-level1-json-jackson1-adapter</module>
         <module>jcr-level1-json-jackson2-adapter</module>
+        <module>jcr-level1-fs-adapter</module>
     </modules>
 
-    <name>JCR V3. Light-weight modular JCR API</name>
+    <name>Lightweight and modular Java Content Repository</name>
 </project>

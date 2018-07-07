@@ -6,7 +6,7 @@
 
     <parent>
         <artifactId>jcr-parent</artifactId>
-        <groupId>javax.jcr.api</groupId>
+        <groupId>com.ljcr.api</groupId>
         <version>0.1.0-SNAPSHOT</version>
     </parent>
     <artifactId>api-core-level1</artifactId>

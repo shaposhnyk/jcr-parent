@@ -34,27 +34,6 @@ public interface ImmutableBinaryValue {
     InputStream getStream();
 
     /**
-     * Reads successive bytes from the specified <code>position</code> in this
-     * <code>ImmutableBinaryValue</code> into the passed byte array until either the byte
-     * array is full or the end of the <code>ImmutableBinaryValue</code> is encountered.
-     * <p>
-     * If {@link #dispose()} has been called on this <code>ImmutableBinaryValue</code>
-     * object, then this method will throw the runtime exception
-     * {@link IllegalStateException}.
-     *
-     * @param b        the buffer into which the data is read.
-     * @param position the position in this ImmutableBinaryValue from which to start reading
-     *                 bytes.
-     * @return the number of bytes read into the buffer, or -1 if there is no
-     * more data because the end of the ImmutableBinaryValue has been reached.
-     * @throws IOException              if an I/O error occurs.
-     * @throws NullPointerException     if b is null.
-     * @throws IllegalArgumentException if offset is negative.
-     * @throws RepositoryException      if another error occurs.
-     */
-    int read(byte[] b, long position) throws IOException;
-
-    /**
      * Returns the size of this <code>ImmutableBinaryValue</code> value in bytes.
      * <p>
      * If {@link #dispose()} has been called on this <code>ImmutableBinaryValue</code>
