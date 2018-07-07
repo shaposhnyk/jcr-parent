@@ -1,4 +1,4 @@
-package com.shaposhnyk.jackson.adapter
+package com.shaposhnyk.jackson2x
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.hamcrest.CoreMatchers.*
@@ -7,7 +7,7 @@ import org.junit.Test
 import javax.jcr.api.definitions.StandardTypes
 import kotlin.streams.toList
 
-class JsonWorkspacesTest {
+class JacksonAdapterTest {
 
     val om = ObjectMapper()
 
@@ -19,7 +19,7 @@ class JsonWorkspacesTest {
             |"myFieldB": true,
             |"myFieldN": null
             |}""".trimMargin())
-        val ws = JsonWorkspaces.createWs(json)
+        val ws = JsonAdapter.createWs(json)
 
         Assert.assertThat(ws.rootNode.name, equalTo(""))
         Assert.assertThat(ws.rootNode.isObjectNode, equalTo(true))
@@ -48,7 +48,7 @@ class JsonWorkspacesTest {
             |"myFieldB": true,
             |"myFieldN": null
             |}""".trimMargin())
-        val ws = JsonWorkspaces.createWs(json)
+        val ws = JsonAdapter.createWs(json)
 
         Assert.assertThat(ws.rootNode.name, equalTo(""))
         Assert.assertThat(ws.rootNode.isArrayNode, equalTo(false))
@@ -95,7 +95,7 @@ class JsonWorkspacesTest {
             |"myFieldM": ["myValue1", 123, true, [1,2,3], null],
             |"myFieldN": null
             |}""".trimMargin())
-        val ws = JsonWorkspaces.createWs(json)
+        val ws = JsonAdapter.createWs(json)
 
         Assert.assertThat(ws.rootNode.name, equalTo(""))
         Assert.assertThat(ws.rootNode.isArrayNode, equalTo(false))

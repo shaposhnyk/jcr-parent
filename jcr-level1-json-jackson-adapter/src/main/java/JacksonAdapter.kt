@@ -1,4 +1,4 @@
-package com.shaposhnyk.jackson.adapter
+package com.shaposhnyk.jackson2x
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.ArrayNode
@@ -14,7 +14,7 @@ import javax.jcr.api.definitions.TypeDefinition
 import javax.jcr.api.exceptions.UnsupportedRepositoryOperationException
 
 
-class JsonWorkspaces {
+class JsonAdapter {
 
     companion object {
         val anyTypes = listOf(StandardTypes.ANYTYPE)
@@ -88,13 +88,13 @@ class JsonImmutableItem(val jsonPath: Path, val json: JsonNode) : ImmutablePrope
     }
 
     override fun getItem(fieldName: String): ImmutableItem {
-        return JsonWorkspaces.of(jsonPath.resolve(fieldName), json.get(fieldName));
+        return JsonAdapter.of(jsonPath.resolve(fieldName), json.get(fieldName));
     }
 
     override fun getItems(): Stream<ImmutableItem> {
         return StreamSupport.stream(
                 Spliterators.spliteratorUnknownSize(json.fields(), Spliterator.ORDERED), false)
-                .map { JsonWorkspaces.of(jsonPath.resolve(it.key), it.value) }
+                .map { JsonAdapter.of(jsonPath.resolve(it.key), it.value) }
     }
 
     override fun isSame(otherItem: ImmutableItem?): Boolean {
@@ -111,7 +111,7 @@ class JsonImmutableItem(val jsonPath: Path, val json: JsonNode) : ImmutablePrope
         }
     }
 
-    override fun getTypeDefinition(): TypeDefinition = JsonWorkspaces.typeOf(json)
+    override fun getTypeDefinition(): TypeDefinition = JsonAdapter.typeOf(json)
 }
 
 class JsonImmutableObjectNode(val item: JsonImmutableItem) : ImmutableObjectNode, ImmutableItem by item {
@@ -122,7 +122,7 @@ class JsonImmutableObjectNode(val item: JsonImmutableItem) : ImmutableObjectNode
 
     override fun isObjectNode(): Boolean = true
 
-    override fun getTypeDefinition(): TypeDefinition = JsonWorkspaces.objectType
+    override fun getTypeDefinition(): TypeDefinition = JsonAdapter.objectType
 
     override fun getItems(): Stream<ImmutableItem> {
         return StreamSupport.stream(
@@ -142,7 +142,7 @@ class JsonImmutableArrayNode(val item: JsonImmutableItem) : ImmutableArrayNode, 
 
     override fun isArrayNode(): Boolean = true
 
-    override fun getTypeDefinition(): TypeDefinition = JsonWorkspaces.arrayType
+    override fun getTypeDefinition(): TypeDefinition = JsonAdapter.arrayType
 
     override fun getItems(): Stream<ImmutableItem> {
         return StreamSupport.stream(
@@ -160,7 +160,7 @@ class JsonImmutableValue(val json: JsonNode) : ImmutableValue {
 
     override fun getDouble(): Double = json.asDouble()
 
-    override fun getTypeDefinition(): TypeDefinition = JsonWorkspaces.typeOf(json)
+    override fun getTypeDefinition(): TypeDefinition = JsonAdapter.typeOf(json)
 }
 
 class JsonImmutableNull : ImmutableValue {
