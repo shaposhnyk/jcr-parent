@@ -46,7 +46,8 @@ class JacksonAdapterTest {
             |"myFieldS": "myValue",
             |"myFieldL": 1234567890,
             |"myFieldB": true,
-            |"myFieldN": null
+            |"myFieldN": null,
+            |"myObject": {"myProp": 1, "myProp2": "some"}
             |}""".trimMargin())
         val ws = JsonAdapter.createWs(json)
 
@@ -61,12 +62,12 @@ class JacksonAdapterTest {
         // field defs
         Assert.assertThat(ws.rootNode.items
                 .map { it.name }
-                .toList(), equalTo(listOf("myFieldS", "myFieldL", "myFieldB", "myFieldN")))
+                .toList(), equalTo(listOf("myFieldS", "myFieldL", "myFieldB", "myFieldN", "myObject")))
 
         // field defs
         Assert.assertThat(ws.rootNode.items
                 .map { it.typeDefinition.identifier }
-                .toList(), equalTo(listOf("String", "Long", "Boolean", "undefined")))
+                .toList(), equalTo(listOf("String", "Long", "Boolean", "undefined", "object")))
 
         Assert.assertThat(ws.rootNode.getItem("myFieldS"), notNullValue())
         Assert.assertThat(ws.rootNode.getItem("myFieldS").typeDefinition, equalTo(StandardTypes.STRING))
@@ -83,6 +84,10 @@ class JacksonAdapterTest {
         Assert.assertThat(ws.rootNode.getItem("myFieldN"), notNullValue())
         Assert.assertThat(ws.rootNode.getItem("myFieldN").typeDefinition, equalTo(StandardTypes.UNDEFINED))
         Assert.assertThat(ws.rootNode.getItem("myFieldN").asProperty().typeDefinition, equalTo(StandardTypes.UNDEFINED))
+
+        Assert.assertThat(ws.rootNode.getItem("myObject"), notNullValue())
+        Assert.assertThat(ws.rootNode.getItem("myObject").typeDefinition.identifier, equalTo("object"))
+        Assert.assertThat(ws.rootNode.getItem("myObject").items.toList().size, equalTo(2))
     }
 
     @Test

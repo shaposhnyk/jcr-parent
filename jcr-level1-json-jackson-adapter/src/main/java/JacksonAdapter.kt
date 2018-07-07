@@ -127,7 +127,7 @@ class JsonImmutableObjectNode(val item: JsonImmutableItem) : ImmutableObjectNode
     override fun getItems(): Stream<ImmutableItem> {
         return StreamSupport.stream(
                 Spliterators.spliteratorUnknownSize(item.json.fields(), Spliterator.ORDERED), false)
-                .map { f -> JsonImmutableItem(item.jsonPath.resolve(f.key), f.value) }
+                .map { f -> JsonAdapter.of(item.jsonPath.resolve(f.key), f.value) }
     }
 
     override fun getItemNames(): Stream<String> {
