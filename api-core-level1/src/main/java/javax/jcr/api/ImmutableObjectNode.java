@@ -3,7 +3,7 @@
  */
 package javax.jcr.api;
 
-import javax.jcr.api.definitions.StandardPropertyTypes;
+import javax.jcr.api.definitions.StandardTypes;
 import javax.jcr.api.definitions.TypeDefinition;
 import javax.jcr.api.exceptions.RepositoryException;
 import java.util.Collection;
@@ -79,7 +79,7 @@ public interface ImmutableObjectNode extends ImmutableItem {
      */
     default Stream<ImmutableProperty> getReferences() {
         return getProperties()
-                .filter(p -> StandardPropertyTypes.REFERENCE.equals(p.getTypeDefinition()));
+                .filter(p -> StandardTypes.REFERENCE.equals(p.getTypeDefinition()));
     }
 
     /**

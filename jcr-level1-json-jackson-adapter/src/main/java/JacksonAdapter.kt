@@ -8,7 +8,8 @@ import java.util.*
 import java.util.stream.Stream
 import java.util.stream.StreamSupport
 import javax.jcr.api.*
-import javax.jcr.api.definitions.StandardPropertyTypes
+import javax.jcr.api.definitions.PropertyDefinition
+import javax.jcr.api.definitions.StandardTypes
 import javax.jcr.api.definitions.TypeDefinition
 import javax.jcr.api.exceptions.UnsupportedRepositoryOperationException
 
@@ -16,9 +17,22 @@ import javax.jcr.api.exceptions.UnsupportedRepositoryOperationException
 class JsonWorkspaces {
 
     companion object {
+        val anyTypes = listOf(StandardTypes.ANYTYPE)
 
-        val objectType = TypeDefinition { "object" };
-        val arrayType = TypeDefinition { "array" };
+        val objectType = object : TypeDefinition {
+            override fun getIdentifier() = "object"
+
+            override fun getDeclaredPropertyDefinitions(): MutableCollection<PropertyDefinition> {
+                return anyTypes.toMutableList()
+            }
+        }
+        val arrayType = object : TypeDefinition {
+            override fun getIdentifier() = "array"
+
+            override fun getDeclaredPropertyDefinitions(): MutableCollection<PropertyDefinition> {
+                return anyTypes.toMutableList()
+            }
+        }
 
         fun of(p: Path, json: JsonNode): ImmutableItem {
             val item = JsonImmutableItem(p, json)
@@ -42,20 +56,20 @@ class JsonWorkspaces {
 
         fun typeOf(json: JsonNode): TypeDefinition {
             if (json.isTextual) {
-                return StandardPropertyTypes.STRING
+                return StandardTypes.STRING
             } else if (json.isBoolean) {
-                return StandardPropertyTypes.BOOLEAN
+                return StandardTypes.BOOLEAN
             } else if (json.isLong || json.isIntegralNumber) {
-                return StandardPropertyTypes.LONG
+                return StandardTypes.LONG
             } else if (json.isBigDecimal) {
-                return StandardPropertyTypes.DECIMAL
+                return StandardTypes.DECIMAL
             } else if (json.isDouble || json.isFloat) {
-                return StandardPropertyTypes.DOUBLE
+                return StandardTypes.DOUBLE
             } else if (json.isBinary) {
-                return StandardPropertyTypes.BINARY
+                return StandardTypes.BINARY
             }
 
-            return StandardPropertyTypes.UNDEFINED
+            return StandardTypes.UNDEFINED
         }
     }
 
@@ -152,11 +166,17 @@ class JsonImmutableValue(val json: JsonNode) : ImmutableValue {
 class JsonImmutableNull : ImmutableValue {
     override fun getString() = null
 
-    override fun getBoolean(): Boolean = throw UnsupportedRepositoryOperationException()
+    override fun getDecimal() = null
+
+    override fun getDate() = null
+
+    override fun getDateTime() = null
+
+    override fun getBoolean() = throw UnsupportedRepositoryOperationException()
 
     override fun getLong() = throw UnsupportedRepositoryOperationException()
 
-    override fun getDouble(): Double = throw UnsupportedRepositoryOperationException()
+    override fun getDouble() = throw UnsupportedRepositoryOperationException()
 
-    override fun getTypeDefinition(): TypeDefinition = StandardPropertyTypes.UNDEFINED
+    override fun getTypeDefinition(): TypeDefinition = StandardTypes.UNDEFINED
 }

@@ -4,10 +4,9 @@
 package javax.jcr.api.definitions;
 
 /**
- * Superclass of {@link NodeDefinition} and {@link PropertyDefinition}.
+ * Superclass of {@link TypeDefinition}
  */
 public interface PropertyDefinition extends TypeDefinition {
-
     /**
      * Reports whether the item is to be automatically created when its parent
      * node is created. If <code>true</code>, then this <code>PropertyDefinition</code>

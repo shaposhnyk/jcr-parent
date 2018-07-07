@@ -45,6 +45,22 @@ public interface TypeDefinition {
      * @see #getDeclaredPropertyDefinitions()
      */
     default Collection<PropertyDefinition> getPropertyDefinitions() {
+        return getDeclaredPropertyDefinitions();
+    }
+
+    /**
+     * Returns an array containing the property definitions actually declared in
+     * this node type.
+     * <p>
+     * In implementations that support node type registration, if this
+     * <code>TypeDefinition</code> object is actually a newly-created empty
+     * <code>NodeTypeTemplate</code>, then this method will return
+     * <code>null</code>.
+     *
+     * @return an array of <code>PropertyDefinition</code>s
+     * @since JCR 2.0 moved here from JCR 1.0 <code>NodeType</code>.
+     */
+    default Collection<PropertyDefinition> getDeclaredPropertyDefinitions() {
         return Collections.emptyList();
     }
 
@@ -142,21 +158,5 @@ public interface TypeDefinition {
      */
     default boolean isQueryable() {
         return true;
-    }
-
-    /**
-     * Returns an array containing the property definitions actually declared in
-     * this node type.
-     * <p>
-     * In implementations that support node type registration, if this
-     * <code>TypeDefinition</code> object is actually a newly-created empty
-     * <code>NodeTypeTemplate</code>, then this method will return
-     * <code>null</code>.
-     *
-     * @return an array of <code>PropertyDefinition</code>s
-     * @since JCR 2.0 moved here from JCR 1.0 <code>NodeType</code>.
-     */
-    default Collection<TypeDefinition> getDeclaredPropertyDefinitions() {
-        return Collections.emptyList();
     }
 }

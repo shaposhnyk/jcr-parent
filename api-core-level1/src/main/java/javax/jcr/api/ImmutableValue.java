@@ -3,7 +3,7 @@
  */
 package javax.jcr.api;
 
-import javax.jcr.api.definitions.StandardPropertyTypes;
+import javax.jcr.api.definitions.StandardTypes;
 import javax.jcr.api.definitions.TypeDefinition;
 import javax.jcr.api.exceptions.RepositoryException;
 import javax.jcr.api.exceptions.UnsupportedRepositoryOperationException;
@@ -179,6 +179,6 @@ public interface ImmutableValue {
      * @return an int
      */
     default TypeDefinition getTypeDefinition() {
-        return StandardPropertyTypes.UNDEFINED;
+        return StandardTypes.UNDEFINED;
     }
 }

@@ -3,9 +3,13 @@
  */
 package javax.jcr.api;
 
+import javax.jcr.api.definitions.StandardTypes;
 import javax.jcr.api.definitions.TypeDefinition;
 import javax.jcr.api.exceptions.RepositoryException;
 import javax.jcr.api.exceptions.ValueFormatException;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.stream.Stream;
 
 /**
@@ -21,6 +25,24 @@ public interface ImmutableProperty extends ImmutableItem, ImmutableValue {
     @Override
     default Stream<ImmutableItem> getItems() {
         return Stream.empty();
+    }
+
+    /**
+     * Returns the <code>type</code> of this <code>ImmutableValue</code>. One of: <ul>
+     * <li><code>PropertyType.STRING</code></li> <li><code>PropertyType.DATE</code></li>
+     * <li><code>PropertyType.BINARY</code></li> <li><code>PropertyType.DOUBLE</code></li>
+     * <li><code>PropertyType.DECIMAL</code></li>
+     * <li><code>PropertyType.LONG</code></li> <li><code>PropertyType.BOOLEAN</code></li>
+     * <li><code>PropertyType.NAME</code></li> <li><code>PropertyType.PATH</code></li>
+     * <li><code>PropertyType.REFERENCE</code></li> <li><code>PropertyType.WEAKREFERENCE</code></li>
+     * <li><code>PropertyType.URI</code></li></ul> See <code>{@link TypeDefinition}</code>.
+     * <p>
+     * The type returned is that which was set at property creation.
+     *
+     * @return an int
+     */
+    default TypeDefinition getTypeDefinition() {
+        return StandardTypes.UNDEFINED;
     }
 
     /**
@@ -41,20 +63,38 @@ public interface ImmutableProperty extends ImmutableItem, ImmutableValue {
         return getValue().getString();
     }
 
-    /**
-     * Returns the property definition that applies to this property. In some
-     * cases there may appear to be more than one definition that could apply to
-     * this node. However, it is assumed that upon creation or change of this
-     * property, a single particular definition is chosen by the implementation.
-     * It is <i>that</i> definition that this method returns. How this governing
-     * definition is selected upon property creation or change from among others
-     * which may have been applicable is an implementation issue and is not
-     * covered by this specification.
-     *
-     * @return a <code>TypeDefinition</code> object.
-     * @throws RepositoryException if an error occurs.
-     */
-    default TypeDefinition getTypeDefinition() {
-        return null;
+    @Override
+    default boolean getBoolean() {
+        return getValue().getBoolean();
+    }
+
+    @Override
+    default BigDecimal getDecimal() {
+        return getValue().getDecimal();
+    }
+
+    @Override
+    default double getDouble() {
+        return getValue().getDouble();
+    }
+
+    @Override
+    default long getLong() throws NumberFormatException {
+        return getValue().getLong();
+    }
+
+    @Override
+    default ImmutableBinaryValue getBinaryValue() {
+        return getValue().getBinaryValue();
+    }
+
+    @Override
+    default LocalDate getDate() {
+        return getValue().getDate();
+    }
+
+    @Override
+    default LocalDateTime getDateTime() {
+        return getValue().getDateTime();
     }
 }
