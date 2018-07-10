@@ -1,5 +1,6 @@
 package com.shaposhnyk.jackson1x
 
+import com.ljcr.api.ImmutableNode
 import com.ljcr.api.definitions.StandardTypes
 import com.ljcr.jackson1x.JsonAdapter
 import org.codehaus.jackson.map.ObjectMapper
@@ -26,19 +27,18 @@ class JacksonAdapterTest {
         Assert.assertThat(ws.rootNode.isObjectNode, equalTo(true))
 
         Assert.assertThat(ws.rootNode.getItem("myFieldS"), notNullValue())
-        Assert.assertThat(ws.rootNode.getItem("myFieldS").asProperty().string, equalTo("myValue"))
+        Assert.assertThat(ws.rootNode.getItem("myFieldS")?.asString(), equalTo("myValue"))
 
         Assert.assertThat(ws.rootNode.getItem("myFieldL"), notNullValue())
-        Assert.assertThat(ws.rootNode.getItem("myFieldL").asProperty().long, equalTo(1234567890L))
+        Assert.assertThat(ws.rootNode.getItem("myFieldL")?.asLong(), equalTo(1234567890L))
 
         Assert.assertThat(ws.rootNode.getItem("myFieldB"), notNullValue())
-        Assert.assertThat(ws.rootNode.getItem("myFieldB").asProperty().boolean, equalTo(true))
+        Assert.assertThat(ws.rootNode.getItem("myFieldB")?.asBoolean(), equalTo(true))
 
-        Assert.assertThat(ws.rootNode.getItem("myFieldN"), notNullValue())
-        Assert.assertThat(ws.rootNode.getItem("myFieldN").asProperty().string, nullValue())
-        Assert.assertThat(ws.rootNode.getItem("myFieldN")
-                .asProperty()
-                .decimal, nullValue())
+        val nullNode: ImmutableNode = ws.rootNode.getItem("myFieldN")!!
+        Assert.assertThat(nullNode, notNullValue())
+        Assert.assertThat(nullNode.asString(), nullValue())
+        Assert.assertThat(nullNode.asDecimal(), nullValue())
     }
 
     @Test
@@ -71,24 +71,20 @@ class JacksonAdapterTest {
                 .toList(), equalTo(listOf("String", "Long", "Boolean", "undefined", "object")))
 
         Assert.assertThat(ws.rootNode.getItem("myFieldS"), notNullValue())
-        Assert.assertThat(ws.rootNode.getItem("myFieldS").typeDefinition, equalTo(StandardTypes.STRING))
-        Assert.assertThat(ws.rootNode.getItem("myFieldS").asProperty().typeDefinition, equalTo(StandardTypes.STRING))
+        Assert.assertThat(ws.rootNode.getItem("myFieldS")?.typeDefinition, equalTo(StandardTypes.STRING))
 
         Assert.assertThat(ws.rootNode.getItem("myFieldL"), notNullValue())
-        Assert.assertThat(ws.rootNode.getItem("myFieldL").typeDefinition, equalTo(StandardTypes.LONG))
-        Assert.assertThat(ws.rootNode.getItem("myFieldL").asProperty().typeDefinition, equalTo(StandardTypes.LONG))
+        Assert.assertThat(ws.rootNode.getItem("myFieldL")?.typeDefinition, equalTo(StandardTypes.LONG))
 
         Assert.assertThat(ws.rootNode.getItem("myFieldB"), notNullValue())
-        Assert.assertThat(ws.rootNode.getItem("myFieldB").typeDefinition, equalTo(StandardTypes.BOOLEAN))
-        Assert.assertThat(ws.rootNode.getItem("myFieldB").asProperty().typeDefinition, equalTo(StandardTypes.BOOLEAN))
+        Assert.assertThat(ws.rootNode.getItem("myFieldB")?.typeDefinition, equalTo(StandardTypes.BOOLEAN))
 
         Assert.assertThat(ws.rootNode.getItem("myFieldN"), notNullValue())
-        Assert.assertThat(ws.rootNode.getItem("myFieldN").typeDefinition, equalTo(StandardTypes.UNDEFINED))
-        Assert.assertThat(ws.rootNode.getItem("myFieldN").asProperty().typeDefinition, equalTo(StandardTypes.UNDEFINED))
+        Assert.assertThat(ws.rootNode.getItem("myFieldN")?.typeDefinition, equalTo(StandardTypes.UNDEFINED))
 
         Assert.assertThat(ws.rootNode.getItem("myObject"), notNullValue())
-        Assert.assertThat(ws.rootNode.getItem("myObject").typeDefinition.identifier, equalTo("object"))
-        Assert.assertThat(ws.rootNode.getItem("myObject").items.toList().size, equalTo(2))
+        Assert.assertThat(ws.rootNode.getItem("myObject")!!.typeDefinition.identifier, equalTo("object"))
+        Assert.assertThat(ws.rootNode.getItem("myObject")!!.items.toList().size, equalTo(2))
     }
 
     @Test
@@ -108,26 +104,26 @@ class JacksonAdapterTest {
         Assert.assertThat(ws.rootNode.isObjectNode, equalTo(true))
 
         val itemS = ws.rootNode.getItem("myFieldS")
-        Assert.assertThat(itemS.isArrayNode, equalTo(true))
-        Assert.assertThat(itemS.typeDefinition.identifier, equalTo("array"))
+        Assert.assertThat(itemS?.isArrayNode, equalTo(true))
+        Assert.assertThat(itemS?.typeDefinition?.identifier, equalTo("array"))
 
-        Assert.assertThat(itemS.asArray().items
-                .map { it.asProperty().string }
-                .toList(), equalTo(listOf("myValue1", "myValue2")))
+        Assert.assertThat(itemS!!.asArrayNode().elements
+                .map { it.asString() }
+                .toList() as List<String>, equalTo(listOf("myValue1", "myValue2")))
 
-        val itemSItems = itemS.asArray().items.toList();
+        val itemSItems = itemS!!.asArrayNode().elements.toList();
         Assert.assertThat(itemSItems[0].typeDefinition, equalTo(StandardTypes.STRING))
 
-        val itemL = ws.rootNode.getItem("myFieldL")
+        val itemL: ImmutableNode = ws.rootNode.getItem("myFieldL")!!
         Assert.assertThat(itemL.isArrayNode, equalTo(true))
-        Assert.assertThat(itemL.asArray().items
-                .map { it.asProperty().long }
+        Assert.assertThat(itemL.asArrayNode().elements
+                .map { it.asLong() }
                 .toList(), equalTo(listOf(123L, 456L)))
-        Assert.assertThat(itemL.asArray().items
-                .map { it.asProperty().string }
-                .toList(), equalTo(listOf("123", "456")))
+        Assert.assertThat(itemL.asArrayNode().elements
+                .map { it.asString() }
+                .toList() as List<String>, equalTo(listOf("123", "456")))
 
-        val itemLItems = itemL.asArray().items.toList();
+        val itemLItems = itemL.asArrayNode().elements.toList();
         Assert.assertThat(itemLItems[0].typeDefinition, equalTo(StandardTypes.LONG))
 
     }

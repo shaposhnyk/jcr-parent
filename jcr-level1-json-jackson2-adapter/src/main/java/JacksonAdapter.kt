@@ -1,17 +1,20 @@
 package com.ljcr.jackson2x
 
 import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.node.ArrayNode
 import com.ljcr.api.*
-import java.nio.file.Path
-import java.nio.file.Paths
-import java.util.*
-import java.util.stream.Stream
-import java.util.stream.StreamSupport
 import com.ljcr.api.definitions.PropertyDefinition
 import com.ljcr.api.definitions.StandardTypes
 import com.ljcr.api.definitions.TypeDefinition
 import com.ljcr.api.exceptions.UnsupportedRepositoryOperationException
+import java.math.BigDecimal
+import java.nio.file.Path
+import java.nio.file.Paths
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.util.*
+import java.util.stream.Stream
+import java.util.stream.StreamSupport
+import kotlin.streams.toList
 
 
 class JsonAdapter {
@@ -34,14 +37,17 @@ class JsonAdapter {
             }
         }
 
-        fun of(p: Path, json: JsonNode): ImmutableItem {
-            val item = JsonImmutableItem(p, json)
+        fun of(p: Path, json: JsonNode): ImmutableNode {
             if (json.isObject) {
+                val item = JsonImmutableNode(p, JsonImmutableValue(json)) { objectType }
                 return JsonImmutableObjectNode(item)
             } else if (json.isArray) {
+                val item = JsonImmutableNode(p, JsonImmutableValue(json)) { arrayType }
                 return JsonImmutableArrayNode(item)
+            } else if (json.isNull) {
+                return JsonImmutableNode(p, JsonImmutableNull(json)) { StandardTypes.UNDEFINED }
             }
-            return item;
+            return JsonImmutableNode(p, JsonImmutableValue(json)) { typeOf(json) }
         }
 
         fun createWs(json: JsonNode): Workspace {
@@ -63,7 +69,7 @@ class JsonAdapter {
                 return StandardTypes.LONG
             } else if (json.isBigDecimal) {
                 return StandardTypes.DECIMAL
-            } else if (json.isDouble || json.isFloat) {
+            } else if (json.isDouble || json.isFloatingPointNumber) {
                 return StandardTypes.DOUBLE
             } else if (json.isBinary) {
                 return StandardTypes.BINARY
@@ -75,108 +81,100 @@ class JsonAdapter {
 
 }
 
-class JsonImmutableItem(val jsonPath: Path, val json: JsonNode) : ImmutableProperty {
-    private val fieldName = if (jsonPath.nameCount == 0) "" else jsonPath.fileName.toString()
+data class JsonImmutableNode(
+        val jsonPath: Path,
+        val jsonValue: JsonImmutableValue,
+        val jsonType: () -> TypeDefinition
+) : ImmutableValue by jsonValue, ImmutableNode {
+    override fun getKey(): Path = jsonPath
 
-    override fun getName(): String = fieldName;
-
-    override fun getPath(): Path = jsonPath.parent
-
-    override fun getValue(): ImmutableValue {
-        return if (json.isNull) JsonImmutableNull()
-        else JsonImmutableValue(json)
+    override fun getItem(fieldName: String): ImmutableNode? {
+        return null
     }
 
-    override fun getItem(fieldName: String): ImmutableItem {
-        return JsonAdapter.of(jsonPath.resolve(fieldName), json.get(fieldName));
-    }
-
-    override fun getItems(): Stream<ImmutableItem> {
-        return StreamSupport.stream(
-                Spliterators.spliteratorUnknownSize(json.fields(), Spliterator.ORDERED), false)
-                .map { JsonAdapter.of(jsonPath.resolve(it.key), it.value) }
-    }
-
-    override fun isSame(otherItem: ImmutableItem?): Boolean {
-        return this.equals(otherItem);
-    }
+    override fun getItems(): Stream<ImmutableNode> = Stream.empty()
 
     override fun accept(visitor: ImmutableItemVisitor) {
-        if (json.isArray) {
-            visitor.visit(JsonImmutableArrayNode(this))
-        } else if (json.isObject) {
-            visitor.visit(JsonImmutableObjectNode(this))
-        } else {
-            visitor.visit(this)
-        }
+        visitor.visit(this)
     }
 
-    override fun getTypeDefinition(): TypeDefinition = JsonAdapter.typeOf(json)
+    override fun getTypeDefinition(): TypeDefinition = jsonType()
 }
 
-class JsonImmutableObjectNode(val item: JsonImmutableItem) : ImmutableObjectNode, ImmutableItem by item {
-    override fun getIdentifier(): String {
-        val ref = item.json.get("reference")
+data class JsonImmutableObjectNode(val item: JsonImmutableNode) : ImmutableNode by item, ImmutableObjectNode {
+    override fun getValue(): Any? = null
+
+    override fun getReference(): String {
+        val ref = item.jsonValue.json.get("reference")
         return if (ref != null) ref.asText() else ""
     }
 
-    override fun isObjectNode(): Boolean = true
+    override fun getItem(fieldName: String): ImmutableNode? {
+        return JsonAdapter.of(item.jsonPath.resolve(fieldName), item.jsonValue.json.get(fieldName))
+    }
 
-    override fun getTypeDefinition(): TypeDefinition = JsonAdapter.objectType
-
-    override fun getItems(): Stream<ImmutableItem> {
+    override fun getItems(): Stream<ImmutableNode> {
         return StreamSupport.stream(
-                Spliterators.spliteratorUnknownSize(item.json.fields(), Spliterator.ORDERED), false)
+                Spliterators.spliteratorUnknownSize(item.jsonValue.json.fields(), Spliterator.ORDERED), false)
                 .map { f -> JsonAdapter.of(item.jsonPath.resolve(f.key), f.value) }
     }
 
-    override fun getItemNames(): Stream<String> {
-        val sourceIterator = item.json.fieldNames().iterator();
+    override fun getFieldNames(): Stream<String> {
+        val sourceIterator = item.jsonValue.json.fieldNames().iterator();
         return StreamSupport.stream(
                 Spliterators.spliteratorUnknownSize(sourceIterator, Spliterator.ORDERED),
                 false)
     }
 }
 
-class JsonImmutableArrayNode(val item: JsonImmutableItem) : ImmutableArrayNode, ImmutableItem by item {
+data class JsonImmutableArrayNode(val item: JsonImmutableNode) : @JvmDefault ImmutableNode by item, ImmutableArrayNode {
+    override fun getValue(): Collection<ImmutableNode> {
+        return items.toList()
+    }
 
-    override fun isArrayNode(): Boolean = true
-
-    override fun getTypeDefinition(): TypeDefinition = JsonAdapter.arrayType
-
-    override fun getItems(): Stream<ImmutableItem> {
+    override fun getItems(): Stream<ImmutableNode> {
         return StreamSupport.stream(
-                Spliterators.spliteratorUnknownSize((item.json as ArrayNode).elements(), Spliterator.ORDERED), false)
-                .map { f -> JsonImmutableItem(item.jsonPath.resolve("0"), f) }
+                Spliterators.spliteratorUnknownSize(item.jsonValue.json.elements(), Spliterator.ORDERED), false)
+                .map { f -> JsonAdapter.of(item.jsonPath.resolve("0"), f) }
     }
 }
 
-class JsonImmutableValue(val json: JsonNode) : ImmutableValue {
-    override fun getString() = json.asText()
+open class JsonImmutableValue(open val json: JsonNode) : ImmutableValue {
+    override fun asDecimal(): BigDecimal? = json.decimalValue()
 
-    override fun getBoolean(): Boolean = json.asBoolean()
+    override fun asDate(): LocalDate? = null
 
-    override fun getLong() = json.asLong()
+    override fun asDateTime(): LocalDateTime? = null
 
-    override fun getDouble(): Double = json.asDouble()
+    override fun asBinaryValue(): ImmutableBinaryValue = throw UnsupportedRepositoryOperationException()
 
-    override fun getTypeDefinition(): TypeDefinition = JsonAdapter.typeOf(json)
+    override fun asObjectNode(): ImmutableObjectNode = throw UnsupportedRepositoryOperationException()
+
+    override fun asArrayNode(): ImmutableArrayNode = throw UnsupportedRepositoryOperationException()
+
+    override fun getValue(): Any? = json
+
+    override fun asString() = json.asText()
+
+    override fun asBoolean(): Boolean = json.asBoolean()
+
+    override fun asLong() = json.asLong()
+
+    override fun asDouble(): Double = json.asDouble()
 }
 
-class JsonImmutableNull : ImmutableValue {
-    override fun getString() = null
+class JsonImmutableNull(override val json: JsonNode) : JsonImmutableValue(json) {
+    override fun asString() = null
 
-    override fun getDecimal() = null
+    override fun asDecimal() = null
 
-    override fun getDate() = null
+    override fun asDate() = null
 
-    override fun getDateTime() = null
+    override fun asDateTime() = null
 
-    override fun getBoolean() = throw UnsupportedRepositoryOperationException()
+    override fun asBoolean() = throw UnsupportedRepositoryOperationException()
 
-    override fun getLong() = throw UnsupportedRepositoryOperationException()
+    override fun asLong() = throw UnsupportedRepositoryOperationException()
 
-    override fun getDouble() = throw UnsupportedRepositoryOperationException()
-
-    override fun getTypeDefinition(): TypeDefinition = StandardTypes.UNDEFINED
+    override fun asDouble() = throw UnsupportedRepositoryOperationException()
 }

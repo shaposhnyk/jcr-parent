@@ -11,7 +11,7 @@ public interface PropertyDefinition extends TypeDefinition {
      * Reports whether the item is to be automatically created when its parent
      * node is created. If <code>true</code>, then this <code>PropertyDefinition</code>
      * will necessarily not be a residual set definition but will specify an
-     * actual item name (in other words getIdentifier() will not return "*").
+     * actual item name (in other words getReference() will not return "*").
      * <p>
      * An autocreated non-protected item must be created immediately when its
      * parent node is created in the transient session space. Creation of

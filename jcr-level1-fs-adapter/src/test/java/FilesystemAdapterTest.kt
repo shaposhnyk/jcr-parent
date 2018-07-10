@@ -1,6 +1,5 @@
 package com.ljcr.filesystems
 
-import com.ljcr.api.ImmutableProperty
 import org.hamcrest.CoreMatchers
 import org.hamcrest.CoreMatchers.*
 import org.junit.After
@@ -50,13 +49,13 @@ class FilesystemAdapterTest {
 
         val item = ws.rootNode.getItem(tempFile.name)
         Assert.assertThat(item, CoreMatchers.notNullValue())
-        Assert.assertThat(item.name, equalTo(tempFile.name))
-        Assert.assertThat(item.typeDefinition.identifier, equalTo("file"))
+        Assert.assertThat(item!!.name, equalTo(tempFile.name))
+        Assert.assertThat(item!!.typeDefinition.identifier, equalTo("file"))
 
-        Assert.assertThat((item.getItem("fileContent") as ImmutableProperty).value.string, equalTo("someText"))
-        Assert.assertThat((item.getItem("size") as ImmutableProperty).value.long, equalTo(8L))
-        Assert.assertThat((item.getItem("isRegularFile") as ImmutableProperty).value.boolean, equalTo(true))
-        Assert.assertThat((item.getItem("creationTime") as ImmutableProperty).value.dateTime, notNullValue())
+        Assert.assertThat(item.getItem("fileContent")!!.asString(), equalTo("someText"))
+        Assert.assertThat(item.getItem("size")?.asLong(), equalTo(8L))
+        Assert.assertThat(item.getItem("isRegularFile")?.asBoolean(), equalTo(true))
+        Assert.assertThat(item.getItem("creationTime")?.asDateTime(), notNullValue())
     }
 
 }

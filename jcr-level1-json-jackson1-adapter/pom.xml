@@ -14,6 +14,7 @@
 
     <properties>
         <kotlin.version>1.2.51</kotlin.version>
+        <kotlin.compiler.jvmTarget>1.8</kotlin.compiler.jvmTarget>
     </properties>
 
     <dependencies>
@@ -75,7 +76,18 @@
                     </execution>
                 </executions>
                 <configuration>
+                    <args>
+                        <arg>-Xjvm-default=enable</arg>
+                    </args>
                     <jvmTarget>1.8</jvmTarget>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
                 </configuration>
             </plugin>
         </plugins>

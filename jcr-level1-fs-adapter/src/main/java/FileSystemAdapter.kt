@@ -4,10 +4,14 @@ import com.ljcr.api.*
 import com.ljcr.api.definitions.PropertyDefinition
 import com.ljcr.api.definitions.StandardTypes
 import com.ljcr.api.definitions.TypeDefinition
+import com.ljcr.api.exceptions.UnsupportedRepositoryOperationException
 import java.io.InputStream
+import java.math.BigDecimal
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
+import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.stream.Stream
 
 
@@ -31,7 +35,7 @@ class FilesystemAdapter {
             }
         }
 
-        fun of(root: Path, p: Path): ImmutableItem {
+        fun of(root: Path, p: Path): ImmutableNode {
             if (!p.isAbsolute) {
                 return of(root, Paths.get("/").resolve(p))
             }
@@ -58,30 +62,24 @@ class FilesystemAdapter {
 }
 
 class FsFolder(val root: Path, val p: Path) : ImmutableObjectNode {
-    override fun getIdentifier(): String = p.toString()
+    override fun getValue(): Any? = null
 
-    override fun getName(): String {
-        return if (p.nameCount == 0) ""
-        else p.fileName.toString()
-    }
+    override fun getKey(): Path = p
 
-    override fun getPath(): Path = p.parent
+    override fun getReference(): String = p.toString()
 
-    override fun getItem(fieldName: String?): ImmutableItem {
+
+    override fun getItem(fieldName: String): ImmutableNode? {
         return FilesystemAdapter.of(root, p.resolve(fieldName))
     }
 
-    override fun getItems(): Stream<ImmutableItem> {
+    override fun getItems(): Stream<ImmutableNode> {
         val realPath = if (p.nameCount == 0) root
         else root.resolve(p.relativize(Paths.get("/")))
         val list = Files.newDirectoryStream(realPath)
                 .map { FilesystemAdapter.of(root, root.relativize(it)) }
         return list // to be fixed. use real stream
                 .stream()
-    }
-
-    override fun isSame(otherItem: ImmutableItem?): Boolean {
-        return this == otherItem
     }
 
     override fun accept(visitor: ImmutableItemVisitor) {
@@ -92,25 +90,23 @@ class FsFolder(val root: Path, val p: Path) : ImmutableObjectNode {
 }
 
 class FsFile(val root: Path, val p: Path) : ImmutableObjectNode {
-    override fun getName(): String = p.fileName.toString() // root object (/) cannot be a file
+    override fun getValue(): Any? = null
 
-    override fun getPath(): Path = p.parent
+    override fun getKey(): Path = p
 
-    override fun getItem(fieldName: String): ImmutableItem {
+    override fun getItem(fieldName: String): ImmutableNode? {
         val realPath = root.resolve(Paths.get("/").relativize(p))
         return if ("fileContent" == fieldName) GenericProperty("fileContent", p, FileContentValue(realPath))
         else GenericProperty(fieldName, p, Files.getAttribute(realPath, fieldName))
     }
 
-    override fun getItems(): Stream<ImmutableItem> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override fun getItems(): Stream<ImmutableNode> {
+        return listOf(getItem("fileContent"))
+                .filterNotNull()
+                .stream()
     }
 
-    override fun getIdentifier(): String = p.toString()
-
-    override fun isSame(otherItem: ImmutableItem?): Boolean {
-        return this == otherItem
-    }
+    override fun getReference(): String = p.toString()
 
     override fun accept(visitor: ImmutableItemVisitor) {
         visitor.visit(this)
@@ -120,53 +116,56 @@ class FsFile(val root: Path, val p: Path) : ImmutableObjectNode {
 
 }
 
-class GenericProperty(val fieldName: String, val p: Path, val value: Any) : ImmutableProperty {
-    override fun getName() = fieldName
+data class GenericProperty(val fieldName: String, val p: Path, val objValue: Any) : ImmutableNode {
+    override fun getKey(): Path = p.resolve(fieldName)
 
-    override fun getItem(fieldName: String?) = null;
-
-    override fun getValue(): ImmutableValue = if (value is FileContentValue) value else GenericValue(value)
+    override fun getName(): String = fieldName
 
     override fun getPath(): Path = p
 
-    override fun isSame(otherItem: ImmutableItem?): Boolean {
-        return this == otherItem
-    }
+    override fun getValue(): Any = objValue
+
+    override fun getItem(fieldName: String): ImmutableNode? = null
+
+    override fun getItems(): Stream<ImmutableNode> = Stream.empty()
+
+    override fun getTypeDefinition(): TypeDefinition = StandardTypes.UNDEFINED
 
     override fun accept(visitor: ImmutableItemVisitor) {
         visitor.visit(this)
     }
-
 }
 
-data class FileContentValue(val p: Path) : ImmutableValue, ImmutableBinaryValue {
-    override fun dispose() {
-        TODO("not implementwed") //To change body of created functions use File | Settings | File Templates.
-    }
+data class FileContentValue(val p: Path) : ImmutableBinaryValue {
+    override fun asLong(): Long = throw UnsupportedRepositoryOperationException()
+
+    override fun asDouble(): Double = throw UnsupportedRepositoryOperationException()
+
+    override fun asDecimal(): BigDecimal? = throw UnsupportedRepositoryOperationException()
+
+    override fun asDate(): LocalDate? = throw UnsupportedRepositoryOperationException()
+
+    override fun asDateTime(): LocalDateTime? = throw UnsupportedRepositoryOperationException()
+
+    override fun asBoolean(): Boolean = throw UnsupportedRepositoryOperationException()
+
+    override fun asBinaryValue(): ImmutableBinaryValue = this
+
+    override fun asObjectNode(): ImmutableObjectNode = throw UnsupportedRepositoryOperationException()
+
+    override fun asArrayNode(): ImmutableArrayNode = throw UnsupportedRepositoryOperationException()
+
+    override fun getValue(): Any = p
 
     override fun size(): Long = Files.size(p)
 
-    override fun getStream(): InputStream {
+    override fun newInputStream(): InputStream {
         return Files.newInputStream(p)
     }
 
-    override fun getString(): String {
-        return java.util.Scanner(stream)
+    override fun asString(): String {
+        return java.util.Scanner(newInputStream())
                 .useDelimiter("\\A")
                 .next()
     }
-}
-
-data class GenericValue(val value: Any) : ImmutableValue {
-    override fun getString(): String = value.toString()
-}
-
-data class GenericStringValue(val value: String) : ImmutableValue {
-    override fun getString(): String = value
-}
-
-data class GenericLongValue(val value: Long) : ImmutableValue {
-    override fun getString(): String = value.toString()
-
-    override fun getLong(): Long = value
 }

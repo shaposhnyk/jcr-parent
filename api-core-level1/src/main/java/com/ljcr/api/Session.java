@@ -3,8 +3,11 @@
  */
 package com.ljcr.api;
 
+import com.ljcr.api.definitions.TypeDefinition;
 import com.ljcr.api.exceptions.*;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.security.auth.login.LoginException;
 import java.nio.file.Path;
 import java.util.Collection;
@@ -25,7 +28,16 @@ import java.util.Collections;
  * "view" of an actual repository workspace entity as seen through the
  * authorization settings of its associated <code>Session</code>.
  */
+@Nonnull
 interface Session {
+
+    /**
+     * Returns the <code>Workspace</code> attached to this
+     * <code>Session</code>.
+     *
+     * @return a <code>{@link Workspace}</code> object.
+     */
+    Workspace getWorkspace();
 
     /**
      * Gets the user ID associated with this <code>Session</code>. How the user
@@ -36,6 +48,7 @@ interface Session {
      *
      * @return the user ID associated with this <code>Session</code>.
      */
+    @Nullable
     String getUserID();
 
     /**
@@ -63,17 +76,10 @@ interface Session {
      * @return the value of the attribute or <code>null</code> if no attribute
      * of the given name exists.
      */
-    default Object getAttribute(String name) {
+    @Nullable
+    default Object getAttribute(@Nonnull String name) {
         return null;
     }
-
-    /**
-     * Returns the <code>Workspace</code> attached to this
-     * <code>Session</code>.
-     *
-     * @return a <code>{@link Workspace}</code> object.
-     */
-    Workspace getWorkspace();
 
     /**
      * Returns the root node of the workspace, "/". This node is the main access
@@ -83,7 +89,7 @@ interface Session {
      * object.
      * @throws RepositoryException if an error occurs.
      */
-    default ImmutableItem getRootNode() {
+    default ImmutableNode getRootNode() {
         return getWorkspace().getRootNode();
     }
 
@@ -107,21 +113,9 @@ interface Session {
      *                             access to perform the operation.
      * @throws RepositoryException if another error occurs.
      */
-    Session impersonate(Credentials credentials) throws LoginException;
-
-    /**
-     * Returns the node specified by the given identifier. Applies to both
-     * referenceable and non-referenceable nodes.
-     *
-     * @param id An identifier.
-     * @return A <code>ImmutableObjectNode</code>.
-     * @throws ItemNotFoundException if no node with the specified identifier
-     *                               exists or if this <code>Session<code> does not have read access to the
-     *                               node with the specified identifier.
-     * @throws RepositoryException   if another error occurs.
-     * @since JCR 2.0
-     */
-    ImmutableObjectNode getNodeByIdentifier(String id) throws ItemNotFoundException;
+    default Session impersonate(Credentials credentials) throws LoginException {
+        return this;
+    }
 
     /**
      * Returns the node at the specified absolute path in the workspace. If no
@@ -135,47 +129,13 @@ interface Session {
      * more efficient than <code>getItem</code>.
      *
      * @param absPath An absolute path.
-     * @return the specified <code>ImmutableItem</code>.
+     * @return the specified <code>ImmutableNode</code>.
      * @throws PathNotFoundException if no accessible item is found at the
      *                               specified path.
      * @throws RepositoryException   if another error occurs.
      */
-    ImmutableItem getItem(Path absPath) throws PathNotFoundException;
-
-    /**
-     * Returns the node at the specified absolute path in the workspace.
-     *
-     * @param absPath An absolute path.
-     * @return the specified <code>ImmutableObjectNode</code>.
-     * @throws PathNotFoundException If no accessible node is found at the
-     *                               specifed path.
-     * @throws RepositoryException   If another error occurs.
-     * @since JCR 2.0
-     */
-    default ImmutableObjectNode getNode(Path absPath) throws PathNotFoundException {
-        ImmutableItem item = getItem(absPath);
-        if (item instanceof ImmutableObjectNode) {
-            return (ImmutableObjectNode) item;
-        }
-        throw new RepositoryException();
-    }
-
-    /**
-     * Returns the property at the specified absolute path in the workspace.
-     *
-     * @param absPath An absolute path.
-     * @return the specified <code>ImmutableProperty</code>.
-     * @throws PathNotFoundException If no accessible property is found at the
-     *                               specified path.
-     * @throws RepositoryException   if another error occurs.
-     * @since JCR 2.0
-     */
-    default ImmutableProperty getProperty(Path absPath) throws PathNotFoundException {
-        ImmutableItem item = getItem(absPath);
-        if (item instanceof ImmutableProperty) {
-            return (ImmutableProperty) item;
-        }
-        throw new RepositoryException();
+    default ImmutableNode getItem(@Nonnull Path absPath) throws PathNotFoundException {
+        return getWorkspace().getItem(absPath);
     }
 
     /**
@@ -188,7 +148,7 @@ interface Session {
      * @throws RepositoryException if <code>absPath</code> is not a well-formed
      *                             absolute path.
      */
-    default boolean itemExists(Path absPath) {
+    default boolean itemExists(@Nonnull Path absPath) {
         return getItem(absPath) != null;
     }
 
@@ -203,43 +163,9 @@ interface Session {
      *                             absolute path.
      * @since JCR 2.0
      */
-    default boolean nodeExists(Path absPath) {
-        return getNode(absPath) != null;
-    }
-
-    /**
-     * Returns <code>true</code> if a property exists at <code>absPath</code>
-     * and this <code>Session</code> has read access to it; otherwise returns
-     * <code>false</code>.
-     *
-     * @param absPath An absolute path.
-     * @return a <code>boolean</code>
-     * @throws RepositoryException if <code>absPath</code> is not a well-formed
-     *                             absolute path.
-     * @since JCR 2.0
-     */
-    default boolean propertyExists(Path absPath) {
-        return getProperty(absPath) != null;
-    }
-
-    /**
-     * If <code>keepChanges</code> is <code>false</code>, this method discards
-     * all pending changes currently recorded in this <code>Session</code> and
-     * returns all items to reflect the current saved state. Outside a
-     * transaction this state is simply the current state of persistent storage.
-     * Within a transaction, this state will reflect persistent storage as
-     * modified by changes that have been saved but not yet committed.
-     * <p>
-     * If <code>keepChanges</code> is true then pending change are not discarded
-     * but items that do not have changes pending have their state refreshed to
-     * reflect the current saved state, thus revealing changes made by other
-     * sessions.
-     *
-     * @param keepChanges a boolean
-     * @throws RepositoryException if an error occurs.
-     */
-    default void refresh(boolean keepChanges) {
-        throw new UnsupportedRepositoryOperationException();
+    default boolean nodeExists(@Nonnull Path absPath) {
+        ImmutableNode item = getItem(absPath);
+        return item != null && item.isObjectNode();
     }
 
     /**
@@ -249,7 +175,9 @@ interface Session {
      * @return a string array
      * @throws RepositoryException if an error occurs
      */
-    Collection<String> getNamespacePrefixes();
+    default Collection<String> getNamespacePrefixes() {
+        return Collections.emptyList();
+    }
 
     /**
      * Returns the URI to which the given <code>prefix</code> is mapped as
@@ -261,7 +189,10 @@ interface Session {
      *                             unknown.
      * @throws RepositoryException if another error occurs
      */
-    String getNamespaceURI(String prefix) throws NamespaceException;
+    @Nullable
+    default String getNamespaceURI(@Nonnull String prefix) throws NamespaceException {
+        return null;
+    }
 
     /**
      * Returns the prefix to which the given <code>uri</code> is mapped as
@@ -272,7 +203,10 @@ interface Session {
      * @throws NamespaceException  if the specified <code>uri</code> is unknown.
      * @throws RepositoryException if another error occurs
      */
-    String getNamespacePrefix(String uri) throws NamespaceException;
+    @Nullable
+    default String getNamespacePrefix(@Nonnull String uri) throws NamespaceException {
+        return null;
+    }
 
     /**
      * Releases all resources associated with this <code>Session</code>. This

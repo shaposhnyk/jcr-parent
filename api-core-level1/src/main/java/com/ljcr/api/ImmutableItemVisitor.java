@@ -5,17 +5,19 @@ package com.ljcr.api;
 
 import com.ljcr.api.exceptions.RepositoryException;
 
+import javax.annotation.Nullable;
+
 /**
  * This interface defines two signatures of the <code>visit</code> method; one
  * taking a <code>ImmutableObjectNode</code>, the other a <code>ImmutableProperty</code>. When an object
- * implementing this interface is passed to <code>{@link ImmutableItem#accept(ImmutableItemVisitor
+ * implementing this interface is passed to <code>{@link ImmutableNode#accept(ImmutableItemVisitor
  * visitor)}</code> the appropriate <code>visit</code> method is automatically
- * called, depending on whether the <code>ImmutableItem</code> in question is a
+ * called, depending on whether the <code>ImmutableNode</code> in question is a
  * <code>ImmutableObjectNode</code> or a <code>ImmutableProperty</code>. Different implementations of
  * this interface can be written for different purposes. It is, for example,
  * possible for the <code>{@link #visit(ImmutableObjectNode node)}</code> method to call
  * <code>accept</code> on the children of the passed node and thus recurse
- * through the tree performing some operation on each <code>ImmutableItem</code>.
+ * through the tree performing some operation on each <code>ImmutableNode</code>.
  */
 public interface ImmutableItemVisitor {
 
@@ -28,7 +30,7 @@ public interface ImmutableItemVisitor {
      *                 visitor.
      * @throws RepositoryException if an error occurs
      */
-    void visit(ImmutableProperty property);
+    void visit(@Nullable ImmutableNode property);
 
     /**
      * This method is called when the <code>ImmutableItemVisitor</code> is passed to the
@@ -38,7 +40,7 @@ public interface ImmutableItemVisitor {
      * @param node The <code>ImmutableObjectNode</code that is accepting this visitor.
      * @throws RepositoryException if an error occurs
      */
-    void visit(ImmutableObjectNode node);
+    void visit(@Nullable ImmutableObjectNode node);
 
     /**
      * This method is called when the <code>ImmutableItemVisitor</code> is passed to the
@@ -48,5 +50,5 @@ public interface ImmutableItemVisitor {
      * @param node The <code>ImmutableObjectNode</code that is accepting this visitor.
      * @throws RepositoryException if an error occurs
      */
-    void visit(ImmutableArrayNode node);
+    void visit(@Nullable ImmutableArrayNode node);
 }

@@ -3,6 +3,7 @@
  */
 package com.ljcr.api.definitions;
 
+import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -20,6 +21,7 @@ import java.util.Collections;
  *
  * @since JCR 2.0
  */
+@Nonnull
 public interface TypeDefinition {
 
     /**

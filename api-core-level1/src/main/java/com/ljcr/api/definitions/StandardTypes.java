@@ -3,7 +3,6 @@
  */
 package com.ljcr.api.definitions;
 
-import com.ljcr.api.ImmutableProperty;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
