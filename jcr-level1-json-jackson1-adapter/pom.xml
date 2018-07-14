@@ -19,14 +19,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-stdlib-jdk8</artifactId>
-            <version>${kotlin.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-test</artifactId>
-            <version>${kotlin.version}</version>
+            <groupId>com.ljcr.api</groupId>
+            <artifactId>jcr-core-tests</artifactId>
+            <version>0.1.0-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
         <dependency>

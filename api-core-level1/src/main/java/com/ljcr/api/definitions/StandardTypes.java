@@ -175,7 +175,7 @@ public final class StandardTypes {
      */
     public static final TypeDefinition DECIMAL = new StandardScalar(12, "Decimal");
 
-    public static final TypeDefinition TYPEDEF = new StandardScalar(13, "TypeDef");
+    public static final TypeDefinition TYPEDEF = new StandardScalar(16, "TypeDef");
 
     /**
      * This constant can be used within a property definition (see <i>4.7.5

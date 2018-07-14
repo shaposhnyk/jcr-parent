@@ -11,9 +11,12 @@
 
     <modules>
         <module>api-core-level1</module>
+        <module>jcr-core-tests</module>
         <module>jcr-level1-json-jackson1-adapter</module>
         <module>jcr-level1-json-jackson2-adapter</module>
         <module>jcr-level1-fs-adapter</module>
+        <module>jcr-level1-srdb-adapter</module>
+        <module>jcr-level1-avro-adapter</module>
     </modules>
 
     <name>Lightweight and modular Java Content Repository</name>

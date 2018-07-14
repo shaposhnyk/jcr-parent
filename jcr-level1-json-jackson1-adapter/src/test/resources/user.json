@@ -1,0 +1,19 @@
+{
+  "id": 10,
+  "username": "myuser",
+  "passwordHash": "DEADBEAF",
+  "signupDate": 123,
+  "emailAddresses": [
+    {
+      "address": "some@one.com",
+      "dateAdded": 123456,
+      "verified": false
+    },
+    {
+      "address": "some@two.com",
+      "dateAdded": 1234567890,
+      "dateBounced": null,
+      "verified": true
+    }
+  ]
+}

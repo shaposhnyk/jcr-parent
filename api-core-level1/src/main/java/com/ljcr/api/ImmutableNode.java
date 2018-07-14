@@ -151,13 +151,13 @@ public interface ImmutableNode extends ImmutableValue {
     @Override
     @Nullable
     default long asLong() throws NumberFormatException {
-        return Long.valueOf(asString());
+        return Long.parseLong(asString());
     }
 
     @Override
     @Nullable
     default double asDouble() throws NumberFormatException {
-        return Double.valueOf(asString());
+        return Double.parseDouble(asString());
     }
 
     @Override
