@@ -11,6 +11,7 @@ import javax.annotation.Nullable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
 /**
@@ -49,7 +50,24 @@ public interface ImmutableValue {
      * @throws RepositoryException   if another error occurs.
      */
     @Nullable
-    String asString();
+    default String asString() {
+        Object objValue = getValue();
+        if (objValue instanceof String) {
+            return (String) objValue;
+        }
+        return objValue == null ? null : objValue.toString();
+    }
+
+    /**
+     * Returns a <code>Boolean</code> representation of this value.
+     *
+     * @return A <code>Boolean</code> representation of this value.
+     * @throws RepositoryException if another error occurs.
+     */
+    @Nullable
+    default boolean asBoolean() {
+        return Boolean.valueOf(asString());
+    }
 
     /**
      * Returns a <code>long</code> representation of this value.
@@ -60,7 +78,9 @@ public interface ImmutableValue {
      * @throws RepositoryException   if another error occurs.
      */
     @Nullable
-    long asLong() throws NumberFormatException;
+    default long asLong() throws NumberFormatException {
+        return Long.parseLong(asString());
+    }
 
     /**
      * Returns a <code>double</code> representation of this value.
@@ -71,7 +91,9 @@ public interface ImmutableValue {
      * @throws RepositoryException   if another error occurs.
      */
     @Nullable
-    double asDouble() throws NumberFormatException;
+    default double asDouble() throws NumberFormatException {
+        return Double.parseDouble(asString());
+    }
 
     /**
      * Returns a <code>BigDecimal</code> representation of this value.
@@ -83,7 +105,9 @@ public interface ImmutableValue {
      * @since JCR 2.0
      */
     @Nullable
-    BigDecimal asDecimal() throws NumberFormatException;
+    default BigDecimal asDecimal() throws NumberFormatException {
+        return new BigDecimal(asString());
+    }
 
     /**
      * Returns a <code>Calendar</code> representation of this value.
@@ -97,7 +121,9 @@ public interface ImmutableValue {
      * @throws RepositoryException    if another error occurs.
      */
     @Nullable
-    LocalDate asDate();
+    default LocalDate asDate() {
+        return LocalDate.parse(asString(), DateTimeFormatter.ISO_DATE);
+    }
 
     /**
      * Returns a <code>Calendar</code> representation of this value.
@@ -111,21 +137,19 @@ public interface ImmutableValue {
      * @throws RepositoryException    if another error occurs.
      */
     @Nullable
-    LocalDateTime asDateTime();
+    default LocalDateTime asDateTime() {
+        return LocalDateTime.parse(asString(), DateTimeFormatter.ISO_DATE_TIME);
+    }
 
+    default ImmutableBinaryValue asBinaryValue() {
+        return (ImmutableBinaryValue) this;
+    }
 
-    /**
-     * Returns a <code>Boolean</code> representation of this value.
-     *
-     * @return A <code>Boolean</code> representation of this value.
-     * @throws RepositoryException if another error occurs.
-     */
-    @Nullable
-    boolean asBoolean();
+    default ImmutableObjectNode asObjectNode() {
+        return (ImmutableObjectNode) this;
+    }
 
-    ImmutableBinaryValue asBinaryValue();
-
-    ImmutableObjectNode asObjectNode();
-
-    ImmutableArrayNode asArrayNode();
+    default ImmutableArrayNode asArrayNode() {
+        return (ImmutableArrayNode) this;
+    }
 }

@@ -8,23 +8,22 @@ import org.codehaus.jackson.JsonNode;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.math.BigDecimal;
-import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 public class JsonImmutableNode implements ImmutableNode {
-    private final Path path;
+    private final String name;
     private final JsonImmutableValue delegate;
     private final Supplier<TypeDefinition> typeSupplier;
 
-    public JsonImmutableNode(Path p, JsonImmutableValue jsonImmutableValue, TypeDefinition type) {
+    public JsonImmutableNode(String p, JsonImmutableValue jsonImmutableValue, TypeDefinition type) {
         this(p, jsonImmutableValue, () -> type);
     }
 
-    public JsonImmutableNode(Path p, JsonImmutableValue jsonImmutableValue, Supplier<TypeDefinition> typeSupplier) {
-        this.path = p;
+    public JsonImmutableNode(String p, JsonImmutableValue jsonImmutableValue, Supplier<TypeDefinition> typeSupplier) {
+        this.name = p;
         this.typeSupplier = typeSupplier;
         this.delegate = jsonImmutableValue;
     }
@@ -33,9 +32,10 @@ public class JsonImmutableNode implements ImmutableNode {
         return delegate.getJsonNode();
     }
 
+    @Nonnull
     @Override
-    public Path getKey() {
-        return path;
+    public String getName() {
+        return name;
     }
 
     @Override

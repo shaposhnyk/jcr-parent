@@ -1,0 +1,14 @@
+#rowId,typeId,reference
+#root item
+1,16,RootNode
+2,16,MyStringList
+3,16,MyObjectList
+4,100,1,/
+#list of strings
+10,2,abc
+11,2,def
+12,2,xyz
+#list of objects
+20,10,objA
+21,20,objB
+22,30,objC

@@ -9,14 +9,13 @@ import org.codehaus.jackson.JsonNode;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.nio.file.Path;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 public class JsonImmutableObjectNode extends JsonImmutableNode implements ImmutableObjectNode {
-    public JsonImmutableObjectNode(Path p, JsonImmutableValue jsonImmutableValue, TypeDefinition type) {
+    public JsonImmutableObjectNode(String p, JsonImmutableValue jsonImmutableValue, TypeDefinition type) {
         super(p, jsonImmutableValue, type);
     }
 
@@ -39,7 +38,7 @@ public class JsonImmutableObjectNode extends JsonImmutableNode implements Immuta
     @Nullable
     @Override
     public ImmutableNode getItem(@Nonnull String fieldName) throws PathNotFoundException {
-        return JacksonAdapter.of(getKey().resolve(fieldName), getJsonNode().get(fieldName));
+        return JacksonAdapter.of(fieldName, getJsonNode().get(fieldName));
     }
 
     @Override
@@ -47,7 +46,7 @@ public class JsonImmutableObjectNode extends JsonImmutableNode implements Immuta
         JsonNode jsonNode = getJsonNode();
         return StreamSupport.stream(
                 Spliterators.spliteratorUnknownSize(getJsonNode().getFieldNames(), Spliterator.ORDERED), false)
-                .map(f -> JacksonAdapter.of(getKey().resolve(f), jsonNode.get(f)));
+                .map(f -> JacksonAdapter.of(f, jsonNode.get(f)));
     }
 
     @Override

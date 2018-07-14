@@ -47,7 +47,6 @@ public abstract class UserRepositorySupport {
 
         ImmutableNode usr = ws.getRootNode();
         assertThat(usr.getName(), equalTo(""));
-        assertThat(usr.getKey(), equalTo(Paths.get("/")));
         assertThat(usr.isObjectNode(), equalTo(Boolean.TRUE));
         assertThat(usr.isArrayNode(), equalTo(Boolean.FALSE));
 
@@ -65,19 +64,17 @@ public abstract class UserRepositorySupport {
         assertThat(ws.getName(), equalTo("User"));
 
         ImmutableNode usr = ws.getRootNode();
-        assertThat(usr.getKey(), equalTo(Paths.get("/")));
+        assertThat(usr.getName(), equalTo(""));
 
         assertThat(usr.getItem("id").getName(), equalTo("id"));
-        assertThat(usr.getItem("id").getPath().toString(), equalTo("/"));
-        assertThat(usr.getItem("id").getKey().toString(), equalTo("/id"));
+        assertThat(usr.getItem("id").getValue(), equalTo(ws.getItem(Paths.get("/id")).getValue()));
 
-        assertThat(usr.getItem("emailAddresses").getValue(), notNullValue());
-        assertThat(usr.getItem("emailAddresses").getPath().toString(), equalTo("/"));
-        assertThat(usr.getItem("emailAddresses").getKey().toString(), equalTo("/emailAddresses"));
+        ImmutableNode emailAddresses = usr.getItem("emailAddresses");
+        assertThat(emailAddresses.getValue(), notNullValue());
+        assertThat(emailAddresses.getName(), equalTo("emailAddresses"));
 
-        assertThat(usr.getItem("emailAddresses").getItem("1").getName().toString(), equalTo("1"));
-        assertThat(usr.getItem("emailAddresses").getItem("1").getPath().toString(), equalTo("/emailAddresses"));
-        assertThat(usr.getItem("emailAddresses").getItem("1").getKey().toString(), equalTo("/emailAddresses/1"));
+        assertThat(emailAddresses.getItem("1").getName().toString(), equalTo("1"));
+        assertThat(emailAddresses.getItem("1").getName(), equalTo(ws.getItem(Paths.get("/emailAddresses/1")).getName()));
     }
 
     @Test
@@ -88,7 +85,6 @@ public abstract class UserRepositorySupport {
 
         ImmutableNode usr = ws.getRootNode();
         assertThat(usr.getName(), equalTo(""));
-        assertThat(usr.getKey(), equalTo(Paths.get("/")));
 
         assertThat(usr.getItem("id").getTypeDefinition(), equalTo(StandardTypes.LONG));
         assertThat(usr.getItem("username").getTypeDefinition(), equalTo(StandardTypes.STRING));
@@ -123,7 +119,8 @@ public abstract class UserRepositorySupport {
 
         assertThat(ws.getName(), equalTo("User"));
 
-        ImmutableArrayNode emails = ws.getRootNode().getItem("emailAddresses").asArrayNode();
+        ImmutableNode rootNode = ws.getRootNode();
+        ImmutableArrayNode emails = rootNode.getItem("emailAddresses").asArrayNode();
         assertThat(emails.getElements().collect(toList()).size(), equalTo(2));
 
         ImmutableNode item2 = emails.getItem("2");

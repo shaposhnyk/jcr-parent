@@ -9,16 +9,15 @@ import org.apache.avro.generic.GenericRecord;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.nio.file.Path;
 import java.util.stream.Stream;
 
 class AvroImmutableObjectNode implements ImmutableObjectNode {
     private final GenericRecord rootRecord;
-    private final Path path;
+    private final String name;
 
-    public AvroImmutableObjectNode(GenericRecord rootRecord, Path path) {
+    public AvroImmutableObjectNode(GenericRecord rootRecord, String path) {
         this.rootRecord = rootRecord;
-        this.path = path;
+        this.name = path;
     }
 
     public String getReference() {
@@ -26,8 +25,10 @@ class AvroImmutableObjectNode implements ImmutableObjectNode {
         return reference instanceof String ? (String) reference : null;
     }
 
-    public Path getKey() {
-        return path;
+    @Nonnull
+    @Override
+    public String getName() {
+        return name;
     }
 
     @Nullable
@@ -38,12 +39,12 @@ class AvroImmutableObjectNode implements ImmutableObjectNode {
     @Nullable
     public ImmutableNode getItem(@Nonnull String fieldName) throws PathNotFoundException {
         Object obj = rootRecord.get(fieldName);
-        return AvroAdapter.nodeOf(obj, path, fieldName);
+        return AvroAdapter.nodeOf(obj, fieldName);
     }
 
     public Stream<ImmutableNode> getItems() {
         return rootRecord.getSchema().getFields().stream()
-                .map(f -> AvroAdapter.nodeOf(rootRecord.get(f.name()), path, f.name()));
+                .map(f -> AvroAdapter.nodeOf(rootRecord.get(f.name()), f.name()));
     }
 
     @Nonnull
@@ -53,5 +54,26 @@ class AvroImmutableObjectNode implements ImmutableObjectNode {
 
     public void accept(@Nonnull ImmutableItemVisitor visitor) {
         visitor.visit(this);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%s[%s]", getClass(), rootRecord);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        } else if (obj instanceof AvroImmutableObjectNode) {
+            return rootRecord.equals(((AvroImmutableObjectNode) obj).rootRecord);
+        }
+
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return rootRecord.hashCode();
     }
 }

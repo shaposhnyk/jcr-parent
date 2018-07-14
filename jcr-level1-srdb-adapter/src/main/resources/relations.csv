@@ -1,0 +1,12 @@
+#parentTypeId,parentItemId,childTypeId,childItemId,valueString,valueDecimal
+#/MyStringList
+#/MyObjectList
+100,1,16,200,,
+100,1,16,300,,
+#/data/product1
+#/data/product1/name
+#/data/product2
+#/data/product2/name
+#/data/product2/price
+#/data/product2/subitem
+#/data/product2/subitem/name

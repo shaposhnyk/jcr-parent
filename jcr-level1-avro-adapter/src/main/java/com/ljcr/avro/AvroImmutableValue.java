@@ -2,26 +2,27 @@ package com.ljcr.avro;
 
 import com.ljcr.api.ImmutableItemVisitor;
 import com.ljcr.api.ImmutableNode;
+import com.ljcr.api.ImmutableValue;
 import com.ljcr.api.definitions.TypeDefinition;
 import com.ljcr.api.exceptions.PathNotFoundException;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.nio.file.Path;
 import java.util.stream.Stream;
 
 public class AvroImmutableValue implements ImmutableNode {
     private final Object value;
-    private final Path path;
+    private final String name;
 
-    public AvroImmutableValue(Object obj, Path path) {
+    public AvroImmutableValue(Object obj, String path) {
         this.value = obj;
-        this.path = path;
+        this.name = path;
     }
 
+    @Nonnull
     @Override
-    public Path getKey() {
-        return path;
+    public String getName() {
+        return name;
     }
 
     @Nullable
@@ -39,7 +40,7 @@ public class AvroImmutableValue implements ImmutableNode {
     @Nullable
     @Override
     public ImmutableNode getItem(@Nonnull String fieldName) throws PathNotFoundException {
-        throw new PathNotFoundException(path.resolve(fieldName).toString());
+        throw new PathNotFoundException(fieldName);
     }
 
     @Override
@@ -56,5 +57,27 @@ public class AvroImmutableValue implements ImmutableNode {
     @Override
     public void accept(@Nonnull ImmutableItemVisitor visitor) {
         visitor.visit(this);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%s[%s]", getClass(), getValue());
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        } else if (value == null || obj == null) {
+            return false;
+        } else if (obj instanceof ImmutableValue) {
+            return getValue().equals(((ImmutableValue) obj).getValue());
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return value == null ? 0 : value.hashCode();
     }
 }

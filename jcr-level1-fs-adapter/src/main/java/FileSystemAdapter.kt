@@ -64,7 +64,9 @@ class FilesystemAdapter {
 class FsFolder(val root: Path, val p: Path) : ImmutableObjectNode {
     override fun getValue(): Any? = null
 
-    override fun getKey(): Path = p
+    fun getKey(): Path = p
+
+    override fun getName() = if (p.nameCount == 0) "" else p.fileName.toString()
 
     override fun getReference(): String = p.toString()
 
@@ -92,7 +94,9 @@ class FsFolder(val root: Path, val p: Path) : ImmutableObjectNode {
 class FsFile(val root: Path, val p: Path) : ImmutableObjectNode {
     override fun getValue(): Any? = null
 
-    override fun getKey(): Path = p
+    fun getKey(): Path = p
+
+    override fun getName() = if (p.nameCount == 0) "" else p.fileName.toString()
 
     override fun getItem(fieldName: String): ImmutableNode? {
         val realPath = root.resolve(Paths.get("/").relativize(p))
@@ -117,11 +121,11 @@ class FsFile(val root: Path, val p: Path) : ImmutableObjectNode {
 }
 
 data class GenericProperty(val fieldName: String, val p: Path, val objValue: Any) : ImmutableNode {
-    override fun getKey(): Path = p.resolve(fieldName)
+    fun getKey(): Path = p.resolve(fieldName)
 
     override fun getName(): String = fieldName
 
-    override fun getPath(): Path = p
+    fun getPath(): Path = p
 
     override fun getValue(): Any = objValue
 

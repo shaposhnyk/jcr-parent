@@ -9,8 +9,6 @@ import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import javax.annotation.Nullable;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -57,19 +55,19 @@ public class JacksonAdapter {
         }
     };
 
-    public static JsonImmutableNode of(Path p, JsonNode json) {
+    public static JsonImmutableNode of(String name, JsonNode json) {
         if (json == null || json.isNull()) {
-            return new JsonImmutableNode(p, JSON_IMMUTABLE_NULL, StandardTypes.UNDEFINED);
+            return new JsonImmutableNode(name, JSON_IMMUTABLE_NULL, StandardTypes.UNDEFINED);
         } else if (json.isObject()) {
-            return new JsonImmutableObjectNode(p, new JsonImmutableValue(json), objectType);
+            return new JsonImmutableObjectNode(name, new JsonImmutableValue(json), objectType);
         } else if (json.isArray()) {
-            return new JsonImmutableArrayNode(p, new JsonImmutableValue(json), arrayType);
+            return new JsonImmutableArrayNode(name, new JsonImmutableValue(json), arrayType);
         }
-        return new JsonImmutableNode(p, new JsonImmutableValue(json), () -> typeOf(json));
+        return new JsonImmutableNode(name, new JsonImmutableValue(json), () -> typeOf(json));
     }
 
     public static Workspace createWs(String name, JsonNode json) {
-        JsonImmutableNode jsonItem = of(Paths.get("/"), json);
+        JsonImmutableNode jsonItem = of("", json);
 
         return new Workspace() {
             @Override

@@ -13,8 +13,6 @@ import org.apache.avro.util.Utf8;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,7 +35,7 @@ public class AvroAdapter {
         FileReader<GenericRecord> streamReader = DataFileReader.openReader(fileName, reader);
 
         GenericRecord rootRecord = streamReader.next(null); // I expect only one record
-        AvroImmutableObjectNode rootNode = new AvroImmutableObjectNode(rootRecord, Paths.get("/"));
+        AvroImmutableObjectNode rootNode = new AvroImmutableObjectNode(rootRecord, "");
 
         return new Workspace() {
             public String getName() {
@@ -54,19 +52,19 @@ public class AvroAdapter {
         return obj == null ? StandardTypes.UNDEFINED : typeMapping.getOrDefault(obj.getClass(), StandardTypes.UNDEFINED);
     }
 
-    static ImmutableNode nodeOf(Object obj, Path path, String fieldName) {
+    static ImmutableNode nodeOf(Object obj, String fieldName) {
         if (obj == null) {
-            return new AvroImmutableValue(null, path.resolve(fieldName));
+            return new AvroImmutableValue(null, fieldName);
         }
 
         if (obj instanceof GenericRecord) {
-            return new AvroImmutableObjectNode((GenericRecord) obj, path.resolve(fieldName));
+            return new AvroImmutableObjectNode((GenericRecord) obj, fieldName);
         } else if (obj instanceof GenericArray<?>) {
-            return new AvroImmutableArrayNode((GenericArray) obj, path.resolve(fieldName));
+            return new AvroImmutableArrayNode((GenericArray) obj, fieldName);
         } else if (obj instanceof Utf8) {
-            return new AvroImmutableValue(((Utf8) obj).toString(), path.resolve(fieldName));
+            return new AvroImmutableValue(((Utf8) obj).toString(), fieldName);
         }
-        return new AvroImmutableValue(obj, path.resolve(fieldName));
+        return new AvroImmutableValue(obj, fieldName);
     }
 }
 

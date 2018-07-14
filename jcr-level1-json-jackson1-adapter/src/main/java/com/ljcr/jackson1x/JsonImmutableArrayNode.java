@@ -8,7 +8,6 @@ import com.ljcr.api.exceptions.PathNotFoundException;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Spliterator;
 import java.util.Spliterators;
@@ -18,7 +17,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 public class JsonImmutableArrayNode extends JsonImmutableNode implements ImmutableArrayNode {
-    public JsonImmutableArrayNode(Path p, JsonImmutableValue jsonImmutableValue, TypeDefinition type) {
+    public JsonImmutableArrayNode(String p, JsonImmutableValue jsonImmutableValue, TypeDefinition type) {
         super(p, jsonImmutableValue, type);
     }
 
@@ -30,7 +29,7 @@ public class JsonImmutableArrayNode extends JsonImmutableNode implements Immutab
     @Nullable
     @Override
     public ImmutableNode getItem(@Nonnull String fieldName) throws PathNotFoundException {
-        return JacksonAdapter.of(getKey().resolve(fieldName), getJsonNode().get(Integer.valueOf(fieldName) - 1));
+        return JacksonAdapter.of(fieldName, getJsonNode().get(Integer.valueOf(fieldName) - 1));
     }
 
     @Override
@@ -38,7 +37,7 @@ public class JsonImmutableArrayNode extends JsonImmutableNode implements Immutab
         final AtomicInteger counter = new AtomicInteger(1);
         return StreamSupport.stream(
                 Spliterators.spliteratorUnknownSize(getJsonNode().getElements(), Spliterator.ORDERED), false)
-                .map(f -> JacksonAdapter.of(getKey().resolve(String.valueOf(counter.getAndIncrement())), f));
+                .map(f -> JacksonAdapter.of(String.valueOf(counter.getAndIncrement()), f));
     }
 
     @Override

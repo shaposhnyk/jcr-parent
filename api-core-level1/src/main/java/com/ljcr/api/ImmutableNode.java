@@ -7,11 +7,6 @@ import com.ljcr.api.exceptions.RepositoryException;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.math.BigDecimal;
-import java.nio.file.Path;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.stream.Stream;
 
 /**
@@ -19,22 +14,6 @@ import java.util.stream.Stream;
  */
 @Nonnull
 public interface ImmutableNode extends ImmutableValue {
-    /**
-     * Returns the normalized absolute path of this item in hierarchy.
-     *
-     * @return the normalized absolute path of this <code>ImmutableNode</code>.
-     * @throws RepositoryException if an error occurs.
-     */
-    Path getKey();
-
-    /**
-     * Returns the value associated with this key
-     *
-     * @return the value associated with this key
-     */
-    @Override
-    @Nullable
-    Object getValue();
 
     /**
      * Returns the name of this <code>ImmutableNode</code> in qualified form. If this
@@ -45,20 +24,17 @@ public interface ImmutableNode extends ImmutableValue {
      * string if this <code>ImmutableNode</code> is the root node of a workspace.
      * @throws RepositoryException if an error occurs.
      */
-    default String getName() {
-        return getKey().getNameCount() == 0 ? "" : getKey().getFileName().toString();
-    }
+    @Nonnull
+    String getName();
 
     /**
-     * Returns the normalized absolute path to this item.
+     * Returns the value associated with this key
      *
-     * @return the normalized absolute path of this <code>ImmutableNode</code>.
-     * @throws RepositoryException if an error occurs.
+     * @return the value associated with this key
      */
-    @Nonnull
-    default Path getPath() {
-        return getKey().getParent();
-    }
+    @Override
+    @Nullable
+    Object getValue();
 
     /**
      * Returns the node at <code>fieldName</code> relative to this node.
@@ -140,63 +116,4 @@ public interface ImmutableNode extends ImmutableValue {
      * @throws RepositoryException if an error occurs.
      */
     void accept(@Nonnull ImmutableItemVisitor visitor);
-
-    @Override
-    @Nullable
-    default String asString() {
-        Object objValue = getValue();
-        return objValue instanceof String ? (String) objValue : null;
-    }
-
-    @Override
-    @Nullable
-    default long asLong() throws NumberFormatException {
-        return Long.parseLong(asString());
-    }
-
-    @Override
-    @Nullable
-    default double asDouble() throws NumberFormatException {
-        return Double.parseDouble(asString());
-    }
-
-    @Override
-    @Nullable
-    default BigDecimal asDecimal() throws NumberFormatException {
-        return BigDecimal.valueOf(asDouble());
-    }
-
-    @Override
-    @Nullable
-    default LocalDate asDate() {
-        return LocalDate.parse(asString(), DateTimeFormatter.ISO_DATE);
-    }
-
-    @Override
-    @Nullable
-    default LocalDateTime asDateTime() {
-        return LocalDateTime.parse(asString(), DateTimeFormatter.ISO_DATE_TIME);
-    }
-
-
-    @Override
-    @Nullable
-    default boolean asBoolean() {
-        return Boolean.valueOf(asString());
-    }
-
-    @Override
-    default ImmutableBinaryValue asBinaryValue() {
-        return (ImmutableBinaryValue) this;
-    }
-
-    @Override
-    default ImmutableObjectNode asObjectNode() {
-        return (ImmutableObjectNode) this;
-    }
-
-    @Override
-    default ImmutableArrayNode asArrayNode() {
-        return (ImmutableArrayNode) this;
-    }
 }

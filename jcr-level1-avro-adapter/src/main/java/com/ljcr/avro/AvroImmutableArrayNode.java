@@ -10,34 +10,34 @@ import org.apache.avro.generic.GenericArray;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.nio.file.Path;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class AvroImmutableArrayNode implements ImmutableArrayNode {
-    private final Path path;
+    private final String name;
     private final GenericArray<?> array;
 
-    public AvroImmutableArrayNode(GenericArray<?> array, Path path) {
+    public AvroImmutableArrayNode(GenericArray<?> array, String path) {
         this.array = array;
-        this.path = path;
+        this.name = path;
     }
 
+    @Nonnull
     @Override
-    public Path getKey() {
-        return path;
+    public String getName() {
+        return name;
     }
 
     @Nullable
     @Override
     public ImmutableNode getItem(@Nonnull String fieldName) throws PathNotFoundException {
-        return AvroAdapter.nodeOf(array.get(Integer.valueOf(fieldName).intValue() - 1), path, fieldName);
+        return AvroAdapter.nodeOf(array.get(Integer.valueOf(fieldName).intValue() - 1), fieldName);
     }
 
     @Override
     public Stream<ImmutableNode> getItems() {
         return IntStream.range(0, array.size())
-                .mapToObj(i -> AvroAdapter.nodeOf(array.get(i), path, String.valueOf(i)));
+                .mapToObj(i -> AvroAdapter.nodeOf(array.get(i), String.valueOf(i)));
     }
 
     @Nonnull
@@ -49,5 +49,25 @@ public class AvroImmutableArrayNode implements ImmutableArrayNode {
     @Override
     public void accept(@Nonnull ImmutableItemVisitor visitor) {
         visitor.visit(this);
+    }
+
+    public String toString() {
+        return String.format("%s[%s]", getClass(), array);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        } else if (obj instanceof AvroImmutableArrayNode) {
+            return array.equals(((AvroImmutableArrayNode) obj).array);
+        }
+
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return array.hashCode();
     }
 }

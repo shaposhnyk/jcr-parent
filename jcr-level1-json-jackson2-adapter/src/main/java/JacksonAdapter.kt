@@ -86,7 +86,7 @@ data class JsonImmutableNode(
         val jsonValue: JsonImmutableValue,
         val jsonType: () -> TypeDefinition
 ) : ImmutableValue by jsonValue, ImmutableNode {
-    override fun getKey(): Path = jsonPath
+    override fun getName() = jsonPath.fileName.toString()
 
     override fun getItem(fieldName: String): ImmutableNode? {
         return null
