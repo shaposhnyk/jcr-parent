@@ -3,7 +3,6 @@
  */
 package com.ljcr.api;
 
-import com.ljcr.api.definitions.TypeDefinition;
 import com.ljcr.api.exceptions.*;
 
 import javax.annotation.Nonnull;
@@ -24,7 +23,7 @@ import java.util.Collections;
  * the <code>workspaceName</code> passed on <code>login</code>.
  * <p>
  * Each <code>Session</code> object is associated one-to-one with a
- * <code>Workspace</code> object. The <code>Workspace</code> object represents a
+ * <code>Repository</code> object. The <code>Repository</code> object represents a
  * "view" of an actual repository workspace entity as seen through the
  * authorization settings of its associated <code>Session</code>.
  */
@@ -32,12 +31,12 @@ import java.util.Collections;
 interface Session {
 
     /**
-     * Returns the <code>Workspace</code> attached to this
+     * Returns the <code>Repository</code> attached to this
      * <code>Session</code>.
      *
-     * @return a <code>{@link Workspace}</code> object.
+     * @return a <code>{@link Repository}</code> object.
      */
-    Workspace getWorkspace();
+    Repository getWorkspace();
 
     /**
      * Gets the user ID associated with this <code>Session</code>. How the user
@@ -100,11 +99,11 @@ interface Session {
      * password, for example), assuming that this <code>Session</code> gives
      * them that permission.
      * <p>
-     * The new <code>Session</code> is tied to a new <code>Workspace</code>
-     * instance. In other words, <code>Workspace</code> instances are not
-     * re-used. However, the <code>Workspace</code> instance returned represents
+     * The new <code>Session</code> is tied to a new <code>Repository</code>
+     * instance. In other words, <code>Repository</code> instances are not
+     * re-used. However, the <code>Repository</code> instance returned represents
      * the same actual persistent workspace entity in the repository as is
-     * represented by the <code>Workspace</code> object tied to this
+     * represented by the <code>Repository</code> object tied to this
      * <code>Session</code>.
      *
      * @param credentials A <code>Credentials</code> object

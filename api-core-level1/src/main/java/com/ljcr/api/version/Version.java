@@ -37,7 +37,7 @@ public interface Version extends ImmutableObjectNode {
 
     /**
      * Assuming that this <code>Version</code> object was acquired through a
-     * <code>Workspace</code> <code>W</code> and is within the
+     * <code>Repository</code> <code>W</code> and is within the
      * <code>VersionHistory</code> <code>H</code>, this method returns the
      * successor of this version along the same line of descent as is returned
      * by <code>H.getAllLinearVersions()</code> where <code>H</code> was also
@@ -68,7 +68,7 @@ public interface Version extends ImmutableObjectNode {
 
     /**
      * Assuming that this <code>Version</code> object was acquired through a
-     * <code>Workspace</code> <code>W</code> and is within the
+     * <code>Repository</code> <code>W</code> and is within the
      * <code>VersionHistory</code> <code>H</code>, this method returns the
      * predecessor of this version along the same line of descent as is returned
      * by <code>H.getAllLinearVersions()</code> where <code>H</code> was also

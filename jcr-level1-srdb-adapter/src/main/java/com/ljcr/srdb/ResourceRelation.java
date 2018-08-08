@@ -1,43 +1,71 @@
 package com.ljcr.srdb;
 
-import javax.persistence.EmbeddedId;
-import javax.persistence.Entity;
+import org.hibernate.annotations.LazyToOne;
+import org.hibernate.annotations.LazyToOneOption;
+
+import javax.persistence.*;
 import java.math.BigDecimal;
 
 @Entity
+@Table(name = "rel")
 public class ResourceRelation {
-    @EmbeddedId
-    private ResourceKey parentKey;
 
-    private ResourceKey childKey;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "rid", nullable = false)
+    private Long id;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @LazyToOne(LazyToOneOption.PROXY)
+    private Resource parent;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @LazyToOne(LazyToOneOption.PROXY)
+    private Resource child;
+
+    @Column(name = "l", length = 5)
+    private String loc;
+
+    @Column(name = "vstr")
     private String stringValue;
 
+    @Column(name = "vdec", precision = 5)
     private BigDecimal decimalValue;
 
     public ResourceRelation() {
         // jpa
     }
 
-    public ResourceRelation(ResourceKey parentKey, ResourceKey childKey) {
-        this.parentKey = parentKey;
-        this.childKey = childKey;
+    public Long getId() {
+        return id;
     }
 
-    public ResourceKey getParentKey() {
-        return parentKey;
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    public void setParentKey(ResourceKey parentKey) {
-        this.parentKey = parentKey;
+    public Resource getParent() {
+        return parent;
     }
 
-    public ResourceKey getChildKey() {
-        return childKey;
+    public void setParent(Resource parent) {
+        this.parent = parent;
     }
 
-    public void setChildKey(ResourceKey childKey) {
-        this.childKey = childKey;
+    public Resource getChild() {
+        return child;
+    }
+
+    public void setChild(Resource child) {
+        this.child = child;
+    }
+
+    public String getLoc() {
+        return loc;
+    }
+
+    public void setLoc(String loc) {
+        this.loc = loc;
     }
 
     public String getStringValue() {
@@ -54,6 +82,11 @@ public class ResourceRelation {
 
     public void setDecimalValue(BigDecimal decimalValue) {
         this.decimalValue = decimalValue;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("[%s]x[%s]:[%s] %s %s", parent.getId(), child.getId(), loc, stringValue, decimalValue);
     }
 }
 

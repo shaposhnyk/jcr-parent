@@ -1,7 +1,7 @@
 package com.ljcr.jackson1x;
 
 import com.ljcr.api.ImmutableNode;
-import com.ljcr.api.Workspace;
+import com.ljcr.api.Repository;
 import com.ljcr.api.definitions.PropertyDefinition;
 import com.ljcr.api.definitions.StandardTypes;
 import com.ljcr.api.definitions.TypeDefinition;
@@ -66,10 +66,10 @@ public class JacksonAdapter {
         return new JsonImmutableNode(name, new JsonImmutableValue(json), () -> typeOf(json));
     }
 
-    public static Workspace createWs(String name, JsonNode json) {
+    public static Repository createWs(String name, JsonNode json) {
         JsonImmutableNode jsonItem = of("", json);
 
-        return new Workspace() {
+        return new Repository() {
             @Override
             public String getName() {
                 return name;

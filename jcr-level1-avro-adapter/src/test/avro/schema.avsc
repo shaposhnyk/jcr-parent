@@ -63,6 +63,30 @@
       }
     },
     {
+      "name": "identities",
+      "doc": "User identifies",
+      "type": {
+        "type": "map",
+        "values": {
+          "type": "record",
+          "name": "Identity",
+          "fields": [
+            {
+              "name": "secretId",
+              "doc": "Secret ID in system",
+              "type": "string"
+            },
+            {
+              "name": "secretKey",
+              "doc": "Secret Key in a system",
+              "type": ["null", "bytes"],
+              "default": null
+            }
+          ]
+        }
+      }
+    },
+    {
       "name": "twitterAccounts",
       "doc": "All Twitter accounts that the user has OAuthed",
       "type": {

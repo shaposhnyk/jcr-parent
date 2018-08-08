@@ -115,5 +115,6 @@ public interface ImmutableNode extends ImmutableValue {
      * @param visitor The ImmutableItemVisitor to be accepted.
      * @throws RepositoryException if an error occurs.
      */
-    void accept(@Nonnull ImmutableItemVisitor visitor);
+    @Nullable
+    <T> T accept(@Nonnull ImmutableItemVisitor<T> visitor);
 }

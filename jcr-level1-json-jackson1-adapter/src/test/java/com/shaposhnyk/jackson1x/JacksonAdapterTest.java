@@ -1,7 +1,7 @@
 package com.shaposhnyk.jackson1x;
 
 import com.ljcr.api.ImmutableNode;
-import com.ljcr.api.Workspace;
+import com.ljcr.api.Repository;
 import com.ljcr.api.definitions.StandardTypes;
 import com.ljcr.jackson1x.JacksonAdapter;
 import org.codehaus.jackson.JsonNode;
@@ -27,7 +27,7 @@ public class JacksonAdapterTest {
                 + "\"myFieldB\": true,"
                 + "\"myFieldN\": null"
                 + "}");
-        Workspace ws = JacksonAdapter.createWs("Test", json);
+        Repository ws = JacksonAdapter.createWs("Test", json);
         ImmutableNode rootNode = ws.getRootNode();
         Assert.assertThat(rootNode.getName(), equalTo(""));
         Assert.assertThat(rootNode.isObjectNode(), equalTo(true));
@@ -50,7 +50,7 @@ public class JacksonAdapterTest {
     @Test
     public void simpleValuesTypesAreOk() throws IOException {
         JsonNode json = om.readTree("{\"myObject\": {\"myProp\":1, \"myProp2\":\"some\"} }");
-        Workspace ws = JacksonAdapter.createWs("Test", json);
+        Repository ws = JacksonAdapter.createWs("Test", json);
         ImmutableNode rootNode = ws.getRootNode();
 
 

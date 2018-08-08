@@ -49,9 +49,10 @@ public class JsonImmutableObjectNode extends JsonImmutableNode implements Immuta
                 .map(f -> JacksonAdapter.of(f, jsonNode.get(f)));
     }
 
+    @Nullable
     @Override
-    public void accept(@Nonnull ImmutableItemVisitor visitor) {
-        visitor.visit(this);
+    public <T> T accept(@Nonnull ImmutableItemVisitor<T> visitor) {
+        return visitor.visit(this);
     }
 
     @Override

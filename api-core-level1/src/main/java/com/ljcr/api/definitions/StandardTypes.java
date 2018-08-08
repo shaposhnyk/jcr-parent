@@ -84,50 +84,50 @@ public final class StandardTypes {
      * The <code>STRING</code> property type is used to store strings. It has
      * the same characteristics as the Java <code>String</code> class.
      */
-    public static final TypeDefinition STRING = new StandardScalar(1, "String");
+    public static final StandardScalar STRING = new StandardScalar(1, "String");
 
     /**
      * <code>BINARY</code> properties are used to store binary data.
      */
-    public static final TypeDefinition BINARY = new StandardScalar(2, "Binary");
+    public static final StandardScalar BINARY = new StandardScalar(2, "Binary");
 
     /**
      * The <code>LONG</code> property type is used to store integers. It has the
      * same characteristics as the Java primitive type <code>long</code>.
      */
-    public static final TypeDefinition LONG = new StandardScalar(3, "Long");
+    public static final StandardScalar LONG = new StandardScalar(3, "Long");
 
     /**
      * The <code>DOUBLE</code> property type is used to store floating point
      * numbers. It has the same characteristics as the Java primitive type
      * <code>double</code>.
      */
-    public static final TypeDefinition DOUBLE = new StandardScalar(4, "Double");
+    public static final StandardScalar DOUBLE = new StandardScalar(4, "Double");
 
     /**
      * The <code>DATE</code> property type is used to store time and date
      * information.
      */
-    public static final TypeDefinition DATE = new StandardScalar(5, "Date");
+    public static final StandardScalar DATE = new StandardScalar(5, "Date");
 
     /**
      * The <code>DATE</code> property type is used to store time and date
      * information.
      */
-    public static final TypeDefinition DATETIME = new StandardScalar(15, "DateTime");
+    public static final StandardScalar DATETIME = new StandardScalar(15, "DateTime");
 
     /**
      * The <code>BOOLEAN</code> property type is used to store boolean values.
      * It has the same characteristics as the Java primitive type
      * <code>boolean</code>.
      */
-    public static final TypeDefinition BOOLEAN = new StandardScalar(6, "Boolean");
+    public static final StandardScalar BOOLEAN = new StandardScalar(6, "Boolean");
 
     /**
      * A <code>NAME</code> is a pairing of a namespace and a local name. When
      * read, the namespace is mapped to the current prefix.
      */
-    public static final TypeDefinition NAME = new StandardScalar(7, "Name");
+    public static final StandardScalar NAME = new StandardScalar(7, "Name");
 
     /**
      * A <code>PATH</code> property is an ordered list of path elements. A path
@@ -135,7 +135,7 @@ public final class StandardTypes {
      * <code>NAME</code>s within the path are mapped to their current prefix. A
      * path may be absolute or relative.
      */
-    public static final TypeDefinition PATH = new StandardScalar(8, "Path");
+    public static final StandardScalar PATH = new StandardScalar(8, "Path");
 
     /**
      * A <code>REFERENCE</code> property stores the identifier of a
@@ -145,7 +145,7 @@ public final class StandardTypes {
      * enforces this referential integrity by preventing the removal of its
      * target node.
      */
-    public static final TypeDefinition REFERENCE = new StandardScalar(9, "Reference");
+    public static final StandardScalar REFERENCE = new StandardScalar(9, "Reference");
 
     /**
      * A <code>WEAKREFERENCE</code> property stores the identifier of a
@@ -155,7 +155,7 @@ public final class StandardTypes {
      *
      * @since JCR 2.0
      */
-    public static final TypeDefinition WEAKREFERENCE = new StandardScalar(10, "WeakReference");
+    public static final StandardScalar WEAKREFERENCE = new StandardScalar(10, "WeakReference");
 
     /**
      * A <code>URI</code> property is identical to <code>STRING</code> property
@@ -164,7 +164,7 @@ public final class StandardTypes {
      *
      * @since JCR 2.0
      */
-    public static final TypeDefinition URI = new StandardScalar(11, "URI");
+    public static final StandardScalar URI = new StandardScalar(11, "URI");
 
     /**
      * The <code>DECIMAL</code> property type is used to store precise decimal
@@ -173,9 +173,9 @@ public final class StandardTypes {
      *
      * @since JCR 2.0
      */
-    public static final TypeDefinition DECIMAL = new StandardScalar(12, "Decimal");
+    public static final StandardScalar DECIMAL = new StandardScalar(12, "Decimal");
 
-    public static final TypeDefinition TYPEDEF = new StandardScalar(16, "TypeDef");
+    public static final StandardScalar TYPEDEF = new StandardScalar(16, "TypeDef");
 
     /**
      * This constant can be used within a property definition (see <i>4.7.5
@@ -185,9 +185,11 @@ public final class StandardTypes {
      * ImmutableProperty#getTypeDefinition} and it cannot be assigned as the type when creating a
      * new property.
      */
-    public static final TypeDefinition UNDEFINED = new StandardScalar(0, "undefined");
+    public static final StandardScalar UNDEFINED = new StandardScalar(0, "undefined");
 
     public static final PropertyDefinition ANYTYPE = new StandardProperty(20, "*", false);
+
+    public static final StandardScalar REPOSITORY = new StandardScalar(100, "RepositoryRoot");
 
     private static final List<TypeDefinition> STANDARD_TYPES = Arrays.asList(
             STRING,

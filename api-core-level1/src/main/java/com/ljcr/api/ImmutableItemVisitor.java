@@ -19,36 +19,36 @@ import javax.annotation.Nullable;
  * <code>accept</code> on the children of the passed node and thus recurse
  * through the tree performing some operation on each <code>ImmutableNode</code>.
  */
-public interface ImmutableItemVisitor {
+public interface ImmutableItemVisitor<T> {
 
     /**
      * This method is called when the <code>ImmutableItemVisitor</code> is passed to the
      * <code>accept</code> method of a <code>ImmutableProperty</code>. If this method
      * throws an exception the visiting process is aborted.
      *
-     * @param property The <code>ImmutableProperty</code> that is accepting this
-     *                 visitor.
+     * @param node The <code>ImmutableProperty</code> that is accepting this
+     *             visitor.
      * @throws RepositoryException if an error occurs
      */
-    void visit(@Nullable ImmutableNode property);
+    T visit(@Nullable ImmutableNode node);
 
     /**
      * This method is called when the <code>ImmutableItemVisitor</code> is passed to the
      * <code>accept</code> method of a <code>ImmutableObjectNode</code>. If this method throws
      * an exception the visiting process is aborted.
      *
-     * @param node The <code>ImmutableObjectNode</code that is accepting this visitor.
+     * @param object The <code>ImmutableObjectNode</code that is accepting this visitor.
      * @throws RepositoryException if an error occurs
      */
-    void visit(@Nullable ImmutableObjectNode node);
+    T visit(@Nullable ImmutableObjectNode object);
 
     /**
      * This method is called when the <code>ImmutableItemVisitor</code> is passed to the
      * <code>accept</code> method of a <code>ImmutableObjectNode</code>. If this method throws
      * an exception the visiting process is aborted.
      *
-     * @param node The <code>ImmutableObjectNode</code that is accepting this visitor.
+     * @param array The <code>ImmutableObjectNode</code that is accepting this visitor.
      * @throws RepositoryException if an error occurs
      */
-    void visit(@Nullable ImmutableArrayNode node);
+    T visit(@Nullable ImmutableArrayNode array);
 }

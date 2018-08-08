@@ -2,7 +2,7 @@ package com.ljcr.tests;
 
 import com.ljcr.api.ImmutableArrayNode;
 import com.ljcr.api.ImmutableNode;
-import com.ljcr.api.Workspace;
+import com.ljcr.api.Repository;
 import com.ljcr.api.definitions.StandardTypes;
 import org.junit.Test;
 
@@ -37,11 +37,11 @@ public abstract class UserRepositorySupport {
     /**
      * @return return custom implementations of a workspace
      */
-    public abstract Workspace createWs();
+    public abstract Repository createWs();
 
     @Test
     public void testUserValues() {
-        Workspace ws = createWs();
+        Repository ws = createWs();
 
         assertThat(ws.getName(), equalTo("User"));
 
@@ -59,7 +59,7 @@ public abstract class UserRepositorySupport {
 
     @Test
     public void testPaths() {
-        Workspace ws = createWs();
+        Repository ws = createWs();
 
         assertThat(ws.getName(), equalTo("User"));
 
@@ -79,7 +79,7 @@ public abstract class UserRepositorySupport {
 
     @Test
     public void testUserValueTypes() {
-        Workspace ws = createWs();
+        Repository ws = createWs();
 
         assertThat(ws.getName(), equalTo("User"));
 
@@ -95,7 +95,7 @@ public abstract class UserRepositorySupport {
 
     @Test
     public void testEmailValues() {
-        Workspace ws = createWs();
+        Repository ws = createWs();
 
         assertThat(ws.getName(), equalTo("User"));
 
@@ -115,7 +115,7 @@ public abstract class UserRepositorySupport {
 
     @Test
     public void testEmailTypes() {
-        Workspace ws = createWs();
+        Repository ws = createWs();
 
         assertThat(ws.getName(), equalTo("User"));
 

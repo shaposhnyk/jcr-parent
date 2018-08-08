@@ -1,7 +1,7 @@
 package com.shaposhnyk.jackson1x;
 
 
-import com.ljcr.api.Workspace;
+import com.ljcr.api.Repository;
 import com.ljcr.jackson1x.JacksonAdapter;
 import com.ljcr.tests.UserRepositorySupport;
 import org.codehaus.jackson.JsonNode;
@@ -13,7 +13,7 @@ public class JsonUserRepositoryTest extends UserRepositorySupport {
 
 
     @Override
-    public Workspace createWs() {
+    public Repository createWs() {
         try {
             JsonNode json = new ObjectMapper().readTree(getClass().getResourceAsStream("/user.json"));
             return JacksonAdapter.createWs("User", json);

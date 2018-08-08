@@ -40,9 +40,10 @@ public class JsonImmutableArrayNode extends JsonImmutableNode implements Immutab
                 .map(f -> JacksonAdapter.of(String.valueOf(counter.getAndIncrement()), f));
     }
 
+    @Nullable
     @Override
-    public void accept(@Nonnull ImmutableItemVisitor visitor) {
-        visitor.visit(this);
+    public <T> T accept(@Nonnull ImmutableItemVisitor<T> visitor) {
+        return visitor.visit(this);
     }
 
     @Override

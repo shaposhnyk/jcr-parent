@@ -61,9 +61,10 @@ public class JsonImmutableNode implements ImmutableNode {
         return typeSupplier.get();
     }
 
+    @Nullable
     @Override
-    public void accept(@Nonnull ImmutableItemVisitor visitor) {
-
+    public <T> T accept(@Nonnull ImmutableItemVisitor<T> visitor) {
+        return visitor.visit(this);
     }
 
     @Override

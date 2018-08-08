@@ -44,10 +44,10 @@ class FilesystemAdapter {
             else FsFile(root, p)
         }
 
-        fun createWs(root: Path): Workspace {
+        fun createWs(root: Path): Repository {
             val jsonItem = of(root, Paths.get("/"));
 
-            return object : Workspace {
+            return object : Repository {
                 override fun getName() = "json"
 
                 override fun getRootNode() = jsonItem
@@ -84,8 +84,8 @@ class FsFolder(val root: Path, val p: Path) : ImmutableObjectNode {
                 .stream()
     }
 
-    override fun accept(visitor: ImmutableItemVisitor) {
-        visitor.visit(this)
+    override fun <T : Any?> accept(visitor: ImmutableItemVisitor<T>): T? {
+        return visitor.visit(this)
     }
 
     override fun getTypeDefinition(): TypeDefinition = FilesystemAdapter.arrayType
@@ -112,8 +112,8 @@ class FsFile(val root: Path, val p: Path) : ImmutableObjectNode {
 
     override fun getReference(): String = p.toString()
 
-    override fun accept(visitor: ImmutableItemVisitor) {
-        visitor.visit(this)
+    override fun <T : Any?> accept(visitor: ImmutableItemVisitor<T>): T? {
+        return visitor.visit(this)
     }
 
     override fun getTypeDefinition(): TypeDefinition = FilesystemAdapter.objectType
@@ -135,8 +135,8 @@ data class GenericProperty(val fieldName: String, val p: Path, val objValue: Any
 
     override fun getTypeDefinition(): TypeDefinition = StandardTypes.UNDEFINED
 
-    override fun accept(visitor: ImmutableItemVisitor) {
-        visitor.visit(this)
+    override fun <T : Any?> accept(visitor: ImmutableItemVisitor<T>): T? {
+        return visitor.visit(this)
     }
 }
 

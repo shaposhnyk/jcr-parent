@@ -3,6 +3,8 @@
  */
 package com.ljcr.api.definitions;
 
+import com.ljcr.api.ImmutableNode;
+
 import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.Collections;
