@@ -11,7 +11,8 @@ import java.math.BigDecimal;
 public class ResourceRelation {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sq_rel_id")
+    @SequenceGenerator(name = "sq_rel_id", sequenceName = "sq_rel_id")
     @Column(name = "rid", nullable = false)
     private Long id;
 
@@ -52,6 +53,11 @@ public class ResourceRelation {
         this.parent = parent;
     }
 
+    public ResourceRelation parent(Resource parent) {
+        setParent(parent);
+        return this;
+    }
+
     public Resource getChild() {
         return child;
     }
@@ -86,7 +92,10 @@ public class ResourceRelation {
 
     @Override
     public String toString() {
-        return String.format("[%s]x[%s]:[%s] %s %s", parent.getId(), child.getId(), loc, stringValue, decimalValue);
+        if (loc == null) {
+            return String.format("(%sX%s)[s=%s,d=%s,r=%s]", parent.getId(), child.getId(), stringValue, decimalValue, id);
+        }
+        return String.format("(%sX%s[%s])[s=%s,d=%s,r=%s]", parent.getId(), child.getId(), loc, stringValue, decimalValue, id);
     }
 }
 

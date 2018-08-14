@@ -19,25 +19,84 @@ public class Application {
     }
 
     @Bean
-    public CommandLineRunner demo(ResourceRepository repository, RelationRepository rels) {
-        return (args) -> demo(repository, rels, args);
+    public CommandLineRunner demo(ResourceRepository res, RelationRepository rels) {
+        return (args) -> demo(res, rels, args);
     }
 
-    public void demo(ResourceRepository repository, RelationRepository rels, String... args) {
+    public void demo(ResourceRepository res, RelationRepository rels, String... args) {
         // save a couple of customers
-        log.info("count: {}", repository.count());
+        long count = res.count();
+        log.info("count: {}", count);
+        showAll(res);
 
-        showAll(repository);
-/*
-        Resource typeDef = repository.findById(StandardTypes.TYPEDEF.getNumericCode() * 1L)
+        if (count < 1) {
+            throw new IllegalStateException("Unknown state of the res");
+        }
+
+        Resource typeDef = res
+                .findById(StandardTypes.TYPEDEF.getNumericCode() * 1L)
                 .get();
 
-        repository.save(typeOf(StandardTypes.STRING, typeDef));
-        repository.save(typeOf(StandardTypes.LONG, typeDef));
-        repository.save(typeOf(StandardTypes.DECIMAL, typeDef));
-        repository.save(typeOf(StandardTypes.REFERENCE, typeDef));
-        repository.save(typeOf(StandardTypes.REPOSITORY, typeDef));
-*/
+        // base types should be already there
+        RelationalTypeDefinition tLocString = typeDef("LocalizedString")
+                .field("locale", StandardTypes.STRING, 5)
+                .field("value", StandardTypes.STRING)
+                .build(res, rels);
+
+        res.save(TypeDefinitionBuilder.typeOf(StandardTypes.STRING, "reference"));
+
+        RelationalTypeDefinition tColor = typeDef("Color")
+                .field("displayName", tLocString)
+                .isReferencable()
+                .build(res, rels);
+
+        RelationalTypeDefinition tShape = typeDef("Shape")
+                .field("displayOrder", StandardTypes.LONG)
+                .field("displayName", tLocString)
+                .isReferencable()
+                .build(res, rels);
+
+        RelationalTypeDefinition tArticle = typeDef("Article")
+                .build(res, rels); // cross-referenced type
+
+        RelationalTypeDefinition tArticle2 = typeDef("Article2")
+                .build(res, rels); // cross-referenced type
+
+        RelationalTypeDefinition tBrand = typeDef("Brand")
+                .field("name", tLocString)
+                .referenceMap("shapes", tShape)
+                .referenceMap("products", tArticle, "Retail articles")
+                .referenceMap("components", tArticle, "Component articles")
+                .isReferencable()
+                .build(res, rels);
+
+        RelationalTypeDefinition tBom = typeDef("BillOfMaterialLine")
+                .reference("article", tArticle)
+                .field("qty", StandardTypes.LONG)
+                .field("role", StandardTypes.STRING)
+                .build(res, rels);
+
+        typeDef(tArticle)
+                .field("name", tLocString)
+                .field("description", tLocString)
+                .field("stdPrice", StandardTypes.DECIMAL)
+                .reference("brandRef", tBrand)
+                .reference("shapeRef", tShape)
+                .reference("colorRef", tColor)
+                .repeatable("bom", tBom)
+                .isReferencable()
+                .build(res, rels);
+
+        showAll(res);
+        showAll(rels);
+    }
+
+    private TypeDefinitionBuilder typeDef(RelationalTypeDefinition tArticle) {
+        return new TypeDefinitionBuilder(tArticle.getIdentifier());
+    }
+
+    private TypeDefinitionBuilder typeDef(String typeName) {
+        return new TypeDefinitionBuilder(typeName);
     }
 
     private <T> void showAll(CrudRepository<T, ?> repository) {
@@ -50,7 +109,7 @@ public class Application {
         log.info("-------------------------------]");
     }
 
-    private Resource typeOf(StandardTypes.StandardScalar type, Resource typeDef) {
-        return new Resource(1L * type.getNumericCode(), typeDef, type.getIdentifier());
+    private static Resource typeOf(StandardTypes.StandardScalar type) {
+        return TypeDefinitionBuilder.typeOf(type);
     }
 }
