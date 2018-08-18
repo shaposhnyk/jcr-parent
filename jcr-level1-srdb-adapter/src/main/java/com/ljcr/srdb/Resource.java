@@ -81,7 +81,7 @@ public class Resource {
 
     @Override
     public String toString() {
-        if (version == 0L) {
+        if (version == null || version == 0L) {
             return String.format("%s(t=%s,id=%s)", reference, typeId, id);
         }
         return String.format("%s(t=%s,id=%s,v=%s)", reference, typeId, id, version);

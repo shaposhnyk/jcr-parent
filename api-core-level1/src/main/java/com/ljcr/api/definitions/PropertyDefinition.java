@@ -6,7 +6,12 @@ package com.ljcr.api.definitions;
 /**
  * Superclass of {@link TypeDefinition}
  */
-public interface PropertyDefinition extends TypeDefinition {
+public interface PropertyDefinition {
+
+    String getIdentifier();
+
+    TypeDefinition getType();
+
     /**
      * Reports whether the item is to be automatically created when its parent
      * node is created. If <code>true</code>, then this <code>PropertyDefinition</code>

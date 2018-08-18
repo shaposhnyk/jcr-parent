@@ -1,0 +1,97 @@
+// ecommerce example
+
+record LocalizedString { // scalar
+    string locale;
+    string text;
+}
+record Color {
+    string reference;
+    LocalizedString displayName;
+}
+record ColorRef {
+    string reference;
+}
+record Shape {
+    string reference;
+    string displayOrder;
+    LocalizedString displayName;
+}
+record ShapeRef {
+    string reference;
+}
+record Brand {
+    string reference;
+    LocalizedString name;
+    map<string,Shape> shapes;
+    map<string,Product> products;
+    map<string,Product> components;
+}
+record BrandRef {
+    string reference;
+}
+record Product {
+    string reference;
+    LocalizedString name;
+    LocalizedString description;
+    decimal(12,2) price;
+    BrandRef brand;
+    ColorRef color;
+    ShapeRef shape;
+    repeatable BillOfMaterialsLine bom;
+}
+record ProductRef {
+    string reference;
+}
+record Component {
+    string reference;
+    LocalizedString name;
+}
+record ComponentRef {
+    string reference;
+}
+record BillOfMaterialsLine {
+    ComponentRef component;
+    int32 qty;
+    string role;
+}
+record Repository {
+    map<string,Color> colors;
+    map<string,Brand> brands;
+}
+
+/ (Root)
+/colors (Map(Colors))
+
+/colors/gold (Color)
+/colors/gold/reference=gold (String)
+/colors/gold/name/en=Gold (String)
+/colors/gold/name/fr=Doré (String)
+
+/colors/silver=obj (Color)
+/colors/silver/reference (String)
+/colors/silver/name/en=silver (String)
+
+/brands (Map(Brand))
+/brands/cool=obj (Brand)
+/brands/super=obj (Brand)
+
+/brands/cool/shapes (Map(Shape))
+/brands/cool/shapes/round=obj (Shape)
+/brands/cool/shapes/round/reference=round
+/brands/cool/shapes/square=obj (Shape)
+/brands/cool/shapes/square/reference=square
+
+/brands/cool/products/
+/brands/cool/products/CL12000/reference=CL12000
+/brands/cool/products/CL12000/name/en=First product
+/brands/cool/products/CL12000/name/fr=Premiere produit
+/brands/cool/products/CL12000/color=gold (ref:Color)
+/brands/cool/products/CL12000/shape=square (ref:Shape)
+
+/brands/cool/products/CL34000/reference=CL34000
+/brands/cool/products/CL34000/name/en=Second product
+/brands/cool/products/CL34000/price=1000.00
+
+/brands/super/products/SU55555/reference=SU55555
+/brands/super/products/SU55555/name/en=Super product
+/brands/super/products/SU55555/price=2000.00

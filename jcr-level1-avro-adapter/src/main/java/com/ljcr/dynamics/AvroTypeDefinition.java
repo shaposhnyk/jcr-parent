@@ -1,6 +1,7 @@
 package com.ljcr.dynamics;
 
 import com.ljcr.api.definitions.PropertyDefinition;
+import com.ljcr.api.definitions.StandardTypes;
 import com.ljcr.api.definitions.TypeDefinition;
 import org.apache.avro.Schema;
 
@@ -11,12 +12,6 @@ import static java.util.stream.Collectors.toList;
 public class AvroTypeDefinition implements TypeDefinition {
     private final Schema schema;
     private final String name;
-
-    private static class AvroPropertyDefinition extends AvroTypeDefinition implements PropertyDefinition {
-        public AvroPropertyDefinition(Schema.Field field, String name) {
-            super(field.schema(), name);
-        }
-    }
 
     public AvroTypeDefinition(Schema schema) {
         this(schema, schema.getName());
@@ -41,8 +36,8 @@ public class AvroTypeDefinition implements TypeDefinition {
 
     private PropertyDefinition propertyOf(Schema.Field f) {
         if (f.doc() != null && f.doc().startsWith("ref:")) {
-            return new AvroPropertyDefinition(f, f.doc().substring("ref:".length()));
+            return StandardTypes.propertyOf(f.doc().substring("ref:".length()), new AvroTypeDefinition(f.schema()));
         }
-        return new AvroPropertyDefinition(f, f.name());
+        return StandardTypes.propertyOf(f.name(), new AvroTypeDefinition(f.schema()));
     }
 }

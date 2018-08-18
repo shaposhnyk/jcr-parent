@@ -61,7 +61,7 @@ public class JacksonAdapterTest {
 
         // assert that defined field is only one - ANY
         Assert.assertThat(rootNode.getTypeDefinition().getDeclaredPropertyDefinitions(),
-                everyItem(equalTo(StandardTypes.ANYTYPE)));
+                everyItem(equalTo(StandardTypes.UNKNOWN_PROPERTY)));
 
         // field defs
         Assert.assertThat(rootNode.getItems().map(it -> it.getName())

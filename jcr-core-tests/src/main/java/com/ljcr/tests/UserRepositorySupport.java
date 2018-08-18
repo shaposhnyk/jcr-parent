@@ -127,6 +127,6 @@ public abstract class UserRepositorySupport {
         assertThat(item2.getItem("address").getTypeDefinition(), equalTo(StandardTypes.STRING));
         assertThat(item2.getItem("dateAdded").getTypeDefinition(), equalTo(StandardTypes.LONG));
         assertThat(item2.getItem("verified").getTypeDefinition(), equalTo(StandardTypes.BOOLEAN));
-        assertThat(item2.getItem("dateBounced").getTypeDefinition(), equalTo(StandardTypes.UNDEFINED));
+        assertThat(item2.getItem("dateBounced").getTypeDefinition(), equalTo(StandardTypes.ANYTYPE));
     }
 }

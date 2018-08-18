@@ -1,6 +1,7 @@
 package com.ljcr.srdb;
 
 import com.ljcr.api.definitions.StandardTypes;
+import com.ljcr.srdb.mods.TypeDefinitionBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -24,6 +25,39 @@ public class Application {
     }
 
     public void demo(ResourceRepository res, RelationRepository rels, String... args) {
+        RelationalTypeDefinition rootType = initSchema(res, rels);
+        initData(rootType, res, rels);
+    }
+
+    private void initData(RelationalTypeDefinition rootType, ResourceRepository res, RelationRepository rels) {
+        TypeBuilder b = newBuilder(res, rels, rootType);
+
+        TypeBuilder goldBuilder = b.newFieldTypeBuilder("colors")
+                .setReference("gold")
+                .setLocalized("displayName", "en", "Gold")
+                .setLocalized("displayName", "fr", "Doré");
+        b.addItem(
+                goldBuilder
+        ).addItem(
+                b.newFieldTypeBuilder("colors")
+                        .setReference("silver")
+                        .setLocalized("displayName", "en", "Silver")
+                        .setLocalized("displayName", "fr", "Argenté")
+        ).addItem(
+                b.newFieldTypeBuilder("brands")
+                        .setReference("super")
+                        .setLocalized("name", "en", "Super")
+        ).build();
+
+        showAll(res);
+        showAll(rels);
+    }
+
+    private TypeBuilder newBuilder(ResourceRepository res, RelationRepository rels, RelationalTypeDefinition rootType) {
+        return new RelationalTypeBuilder(res, rels, rootType);
+    }
+
+    public RelationalTypeDefinition initSchema(ResourceRepository res, RelationRepository rels) {
         // save a couple of customers
         long count = res.count();
         log.info("count: {}", count);
@@ -33,36 +67,36 @@ public class Application {
             throw new IllegalStateException("Unknown state of the res");
         }
 
-        Resource typeDef = res
-                .findById(StandardTypes.TYPEDEF.getNumericCode() * 1L)
-                .get();
+        // next objects must exist already in DB
+        Resource tArray = res.findType(StandardTypes.ARRAY).get();
+        Resource tMap = res.findType(StandardTypes.MAP).get();
+        Resource typeDef = res.findType(StandardTypes.TYPEDEF).get();
+        Resource repoRoot = res.findType(StandardTypes.REPOSITORY).get();
+
+        res.save(TypeDefinitionBuilder.aliasOf(StandardTypes.STRING, "reference"));
 
         // base types should be already there
-        RelationalTypeDefinition tLocString = typeDef("LocalizedString")
+        RelationalTypeDefinition tLocString = newTypeDef("LocalizedString")
                 .field("locale", StandardTypes.STRING, 5)
                 .field("value", StandardTypes.STRING)
                 .build(res, rels);
 
-        res.save(TypeDefinitionBuilder.typeOf(StandardTypes.STRING, "reference"));
-
-        RelationalTypeDefinition tColor = typeDef("Color")
+        RelationalTypeDefinition tColor = newTypeDef("Color")
                 .field("displayName", tLocString)
                 .isReferencable()
                 .build(res, rels);
 
-        RelationalTypeDefinition tShape = typeDef("Shape")
+        RelationalTypeDefinition tShape = newTypeDef("Shape")
                 .field("displayOrder", StandardTypes.LONG)
                 .field("displayName", tLocString)
                 .isReferencable()
                 .build(res, rels);
 
-        RelationalTypeDefinition tArticle = typeDef("Article")
+        RelationalTypeDefinition tArticle = newTypeDef("Article")
+                .isReferencable()
                 .build(res, rels); // cross-referenced type
 
-        RelationalTypeDefinition tArticle2 = typeDef("Article2")
-                .build(res, rels); // cross-referenced type
-
-        RelationalTypeDefinition tBrand = typeDef("Brand")
+        RelationalTypeDefinition tBrand = newTypeDef("Brand")
                 .field("name", tLocString)
                 .referenceMap("shapes", tShape)
                 .referenceMap("products", tArticle, "Retail articles")
@@ -70,13 +104,13 @@ public class Application {
                 .isReferencable()
                 .build(res, rels);
 
-        RelationalTypeDefinition tBom = typeDef("BillOfMaterialLine")
+        RelationalTypeDefinition tBom = newTypeDef("BillOfMaterialLine")
                 .reference("article", tArticle)
                 .field("qty", StandardTypes.LONG)
                 .field("role", StandardTypes.STRING)
                 .build(res, rels);
 
-        typeDef(tArticle)
+        newTypeDef(tArticle)
                 .field("name", tLocString)
                 .field("description", tLocString)
                 .field("stdPrice", StandardTypes.DECIMAL)
@@ -84,18 +118,26 @@ public class Application {
                 .reference("shapeRef", tShape)
                 .reference("colorRef", tColor)
                 .repeatable("bom", tBom)
-                .isReferencable()
                 .build(res, rels);
+
+
+        RelationalTypeDefinition repo = newTypeDef("RepositoryType")
+                .referenceMap("colors", tColor)
+                .referenceMap("brands", tBrand)
+                .build(res, rels);
+
 
         showAll(res);
         showAll(rels);
+
+        return repo;
     }
 
-    private TypeDefinitionBuilder typeDef(RelationalTypeDefinition tArticle) {
-        return new TypeDefinitionBuilder(tArticle.getIdentifier());
+    private TypeDefinitionBuilder newTypeDef(RelationalTypeDefinition tArticle) {
+        return new TypeDefinitionBuilder(tArticle.getTypeResource());
     }
 
-    private TypeDefinitionBuilder typeDef(String typeName) {
+    private TypeDefinitionBuilder newTypeDef(String typeName) {
         return new TypeDefinitionBuilder(typeName);
     }
 
@@ -110,6 +152,6 @@ public class Application {
     }
 
     private static Resource typeOf(StandardTypes.StandardScalar type) {
-        return TypeDefinitionBuilder.typeOf(type);
+        return TypeDefinitionBuilder.resourceOf(type);
     }
 }

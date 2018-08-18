@@ -82,7 +82,7 @@ public abstract class AvroImmutableMapNode<T extends CharSequence> implements Im
     @Nonnull
     @Override
     public TypeDefinition getTypeDefinition() {
-        return StandardTypes.UNDEFINED;
+        return StandardTypes.ANYTYPE;
     }
 
     @Override

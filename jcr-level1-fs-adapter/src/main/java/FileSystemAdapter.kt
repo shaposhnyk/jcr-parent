@@ -18,7 +18,7 @@ import java.util.stream.Stream
 class FilesystemAdapter {
 
     companion object {
-        val anyTypes = listOf(StandardTypes.ANYTYPE)
+        val anyTypes = listOf(StandardTypes.UNKNOWN_PROPERTY)
 
         val objectType = object : TypeDefinition {
             override fun getIdentifier() = "file"
@@ -55,7 +55,7 @@ class FilesystemAdapter {
         }
 
         fun typeOf(json: Path): TypeDefinition {
-            return StandardTypes.UNDEFINED
+            return StandardTypes.ANYTYPE;
         }
     }
 
@@ -133,7 +133,7 @@ data class GenericProperty(val fieldName: String, val p: Path, val objValue: Any
 
     override fun getItems(): Stream<ImmutableNode> = Stream.empty()
 
-    override fun getTypeDefinition(): TypeDefinition = StandardTypes.UNDEFINED
+    override fun getTypeDefinition(): TypeDefinition = StandardTypes.ANYTYPE
 
     override fun <T : Any?> accept(visitor: ImmutableItemVisitor<T>): T? {
         return visitor.visit(this)

@@ -53,7 +53,7 @@ public class ResourceRelation {
         this.parent = parent;
     }
 
-    public ResourceRelation parent(Resource parent) {
+    public ResourceRelation withParent(Resource parent) {
         setParent(parent);
         return this;
     }
@@ -66,12 +66,22 @@ public class ResourceRelation {
         this.child = child;
     }
 
+    public ResourceRelation withChild(Resource child) {
+        setChild(child);
+        return this;
+    }
+
     public String getLoc() {
         return loc;
     }
 
     public void setLoc(String loc) {
         this.loc = loc;
+    }
+
+    public ResourceRelation withLocale(String l) {
+        setLoc(l);
+        return this;
     }
 
     public String getStringValue() {
@@ -82,8 +92,22 @@ public class ResourceRelation {
         this.stringValue = stringValue;
     }
 
+    public ResourceRelation withStringValue(String stringValue) {
+        setStringValue(stringValue);
+        return this;
+    }
+
     public BigDecimal getDecimalValue() {
         return decimalValue;
+    }
+
+    public ResourceRelation withDecimalValue(BigDecimal decimal) {
+        setDecimalValue(decimal);
+        return this;
+    }
+
+    public ResourceRelation withLongValue(Long value) {
+        return withDecimalValue(value == null ? null : BigDecimal.valueOf(value));
     }
 
     public void setDecimalValue(BigDecimal decimalValue) {

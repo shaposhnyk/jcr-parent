@@ -3,6 +3,7 @@
  */
 package com.ljcr.api.definitions;
 
+import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -62,23 +63,18 @@ public final class StandardTypes {
         }
     }
 
-    public static final class StandardProperty extends StandardScalar implements PropertyDefinition {
-        private final boolean isMandatory;
-
-        StandardProperty(int id, String code, boolean isMandatory) {
-            super(id, code);
-            this.isMandatory = isMandatory;
-        }
-
-        @Override
-        public boolean isMandatory() {
-            return isMandatory;
-        }
-    }
-
     /*
      * The supported property types.
      */
+
+    /**
+     * This constant can be used within a property definition (see <i>4.7.5
+     * ImmutableProperty Definitions</i>) to specify that the property in question may be
+     * of any type. However, it cannot be the actual type of any property
+     * instance. For example, it will never be returned by and
+     * it cannot be assigned as the type when creating a new property.
+     */
+    public static final StandardScalar ANYTYPE = new StandardScalar(0, "*");
 
     /**
      * The <code>STRING</code> property type is used to store strings. It has
@@ -108,13 +104,7 @@ public final class StandardTypes {
      * The <code>DATE</code> property type is used to store time and date
      * information.
      */
-    public static final StandardScalar DATE = new StandardScalar(5, "Date");
-
-    /**
-     * The <code>DATE</code> property type is used to store time and date
-     * information.
-     */
-    public static final StandardScalar DATETIME = new StandardScalar(15, "DateTime");
+    public static final StandardScalar DATETIME = new StandardScalar(5, "DateTime");
 
     /**
      * The <code>BOOLEAN</code> property type is used to store boolean values.
@@ -145,7 +135,11 @@ public final class StandardTypes {
      * enforces this referential integrity by preventing the removal of its
      * target node.
      */
-    public static final StandardScalar REFERENCE = new StandardScalar(9, "Reference");
+    public static StandardScalar referenceOf(TypeDefinition valueType) {
+        return valueTypeOf(9, "Reference", valueType);
+    }
+
+    public static final StandardScalar REFERENCE = referenceOf(ANYTYPE);
 
     /**
      * A <code>WEAKREFERENCE</code> property stores the identifier of a
@@ -155,7 +149,12 @@ public final class StandardTypes {
      *
      * @since JCR 2.0
      */
-    public static final StandardScalar WEAKREFERENCE = new StandardScalar(10, "WeakReference");
+    public static StandardScalar weakReferenceOf(TypeDefinition valueType) {
+        return valueTypeOf(10, "WeakReference", valueType);
+    }
+
+    public static final StandardScalar WEAKREFERENCE = weakReferenceOf(ANYTYPE);
+
 
     /**
      * A <code>URI</code> property is identical to <code>STRING</code> property
@@ -175,21 +174,30 @@ public final class StandardTypes {
      */
     public static final StandardScalar DECIMAL = new StandardScalar(12, "Decimal");
 
+    // end of standard JCR types
     public static final StandardScalar TYPEDEF = new StandardScalar(16, "TypeDef");
 
     /**
-     * This constant can be used within a property definition (see <i>4.7.5
-     * ImmutableProperty Definitions</i>) to specify that the property in question may be
-     * of any type. However, it cannot be the actual type of any property
-     * instance. For example, it will never be returned by {@link
-     * ImmutableProperty#getTypeDefinition} and it cannot be assigned as the type when creating a
-     * new property.
+     * The <code>DATE</code> property type is used to store date only
+     * information.
      */
-    public static final StandardScalar UNDEFINED = new StandardScalar(0, "undefined");
+    public static final StandardScalar DATE = new StandardScalar(17, "Date");
 
-    public static final PropertyDefinition ANYTYPE = new StandardProperty(20, "*", false);
+    public static StandardScalar arrayOf(TypeDefinition valueType) {
+        return valueTypeOf(18, "Array", valueType);
+    }
 
-    public static final StandardScalar REPOSITORY = new StandardScalar(100, "RepositoryRoot");
+    public static final StandardScalar ARRAY = arrayOf(ANYTYPE);
+
+    public static StandardScalar mapOf(TypeDefinition valueType) {
+        return valueTypeOf(19, "Map", valueType);
+    }
+
+    public static final StandardScalar MAP = mapOf(ANYTYPE);
+
+    public static final StandardScalar NULL = new StandardScalar(20, "null");
+
+    public static final StandardScalar REPOSITORY = new StandardScalar(65, "RepositoryRoot");
 
     private static final List<TypeDefinition> STANDARD_TYPES = Arrays.asList(
             STRING,
@@ -202,10 +210,14 @@ public final class StandardTypes {
             URI,
             PATH,
             NAME,
-            REFERENCE,
+            // special types
+            REFERENCE, // reference to another object
             WEAKREFERENCE,
+            ARRAY,
+            MAP,
             TYPEDEF,
-            ANYTYPE
+            ANYTYPE,
+            NULL
     );
 
 
@@ -249,6 +261,16 @@ public final class StandardTypes {
     StandardTypes() {
     }
 
+    public static StandardScalar valueTypeOf(int id, String name, TypeDefinition valueType) {
+        return new StandardScalar(id, name) {
+            @Nullable
+            @Override
+            public TypeDefinition getValueType() {
+                return valueType;
+            }
+        };
+    }
+
     /**
      * Scalar type
      *
@@ -260,25 +282,44 @@ public final class StandardTypes {
         return new StandardScalar(numericId, namespace + "/" + typeName);
     }
 
+    public static final PropertyDefinition UNKNOWN_PROPERTY = propertyOf("*", StandardTypes.ANYTYPE);
+
     /**
-     * Default non-mandatory property
-     *
-     * @param numericId - numericId for jcr compatibility
-     * @param namespace - namespace
-     * @param typeName  - typeName
+     * Default non-mandatory property of given type
      */
-    public static PropertyDefinition propertyOf(int numericId, String namespace, String typeName) {
-        return new StandardProperty(numericId, namespace + "/" + typeName, false);
+    public static PropertyDefinition propertyOf(String fieldName, TypeDefinition type) {
+        return new PropertyDefinition() {
+            @Override
+            public String getIdentifier() {
+                return fieldName;
+            }
+
+            @Override
+            public TypeDefinition getType() {
+                return type;
+            }
+        };
     }
 
     /**
-     * Default mandatory property
-     *
-     * @param numericId - numericId for jcr compatibility
-     * @param namespace - namespace
-     * @param typeName  - typeName
+     * Default mandatory property of given type
      */
-    public static PropertyDefinition mandatoryPropertyOf(int numericId, String namespace, String typeName) {
-        return new StandardProperty(numericId, namespace + "/" + typeName, true);
+    public static PropertyDefinition mandatoryPropertyOf(String fieldName, TypeDefinition type) {
+        return new PropertyDefinition() {
+            @Override
+            public String getIdentifier() {
+                return fieldName;
+            }
+
+            @Override
+            public TypeDefinition getType() {
+                return type;
+            }
+
+            @Override
+            public boolean isMandatory() {
+                return true;
+            }
+        };
     }
 }

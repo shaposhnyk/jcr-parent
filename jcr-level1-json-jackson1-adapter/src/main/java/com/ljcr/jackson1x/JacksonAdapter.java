@@ -30,7 +30,7 @@ public class JacksonAdapter {
         }
     };
 
-    private static final List<PropertyDefinition> anyTypes = Arrays.asList(StandardTypes.ANYTYPE);
+    private static final List<PropertyDefinition> anyTypes = Arrays.asList(StandardTypes.UNKNOWN_PROPERTY);
 
     private static final TypeDefinition objectType = new TypeDefinition() {
         @Override
@@ -57,7 +57,7 @@ public class JacksonAdapter {
 
     public static JsonImmutableNode of(String name, JsonNode json) {
         if (json == null || json.isNull()) {
-            return new JsonImmutableNode(name, JSON_IMMUTABLE_NULL, StandardTypes.UNDEFINED);
+            return new JsonImmutableNode(name, JSON_IMMUTABLE_NULL, StandardTypes.ANYTYPE);
         } else if (json.isObject()) {
             return new JsonImmutableObjectNode(name, new JsonImmutableValue(json), objectType);
         } else if (json.isArray()) {
@@ -97,7 +97,7 @@ public class JacksonAdapter {
             return StandardTypes.BINARY;
         }
 
-        return StandardTypes.UNDEFINED;
+        return StandardTypes.ANYTYPE;
     }
 }
 

@@ -6,6 +6,7 @@ package com.ljcr.api.definitions;
 import com.ljcr.api.ImmutableNode;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -49,6 +50,13 @@ public interface TypeDefinition {
      */
     default Collection<PropertyDefinition> getPropertyDefinitions() {
         return getDeclaredPropertyDefinitions();
+    }
+
+    default PropertyDefinition getFieldDefByName(String name) {
+        return getPropertyDefinitions().stream()
+                .filter(f -> name.equals(f.getIdentifier()))
+                .findFirst()
+                .orElse(null);
     }
 
     /**
@@ -161,5 +169,20 @@ public interface TypeDefinition {
      */
     default boolean isQueryable() {
         return true;
+    }
+
+    /**
+     * @return type definition of value items for arrays, maps and enums
+     */
+    @Nullable
+    default TypeDefinition getValueType() {
+        return null;
+    }
+
+    /**
+     * @return true of objects of that type have unique references
+     */
+    default boolean isReferencable() {
+        return false;
     }
 }
