@@ -18,11 +18,18 @@ public class ResourceRelation {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @LazyToOne(LazyToOneOption.PROXY)
+    @JoinColumn(name = "parent_id")
     private Resource parent;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @LazyToOne(LazyToOneOption.PROXY)
+    @JoinColumn(name = "field_id")
     private Resource child;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @LazyToOne(LazyToOneOption.PROXY)
+    @JoinColumn(name = "value_id")
+    private Resource value;
 
     @Column(name = "l", length = 5)
     private String loc;
@@ -30,8 +37,8 @@ public class ResourceRelation {
     @Column(name = "vstr")
     private String stringValue;
 
-    @Column(name = "vdec", precision = 5)
-    private BigDecimal decimalValue;
+    @Column(name = "vdec", precision = 20, scale = 12)
+    private BigDecimal decimal;
 
     public ResourceRelation() {
         // jpa
@@ -71,6 +78,19 @@ public class ResourceRelation {
         return this;
     }
 
+    public Resource getResourceValue() {
+        return value;
+    }
+
+    public void setValue(Resource value) {
+        this.value = value;
+    }
+
+    public ResourceRelation withResourceValue(Resource resourceValue) {
+        setValue(resourceValue);
+        return this;
+    }
+
     public String getLoc() {
         return loc;
     }
@@ -98,28 +118,33 @@ public class ResourceRelation {
     }
 
     public BigDecimal getDecimalValue() {
-        return decimalValue;
+        return decimal;
+    }
+
+    public void setDecimal(BigDecimal decimal) {
+        this.decimal = decimal;
     }
 
     public ResourceRelation withDecimalValue(BigDecimal decimal) {
-        setDecimalValue(decimal);
+        setDecimal(decimal);
         return this;
     }
 
-    public ResourceRelation withLongValue(Long value) {
-        return withDecimalValue(value == null ? null : BigDecimal.valueOf(value));
+    public Long getLongValue() {
+        return decimal.longValue();
     }
 
-    public void setDecimalValue(BigDecimal decimalValue) {
-        this.decimalValue = decimalValue;
+    public ResourceRelation withLongValue(Long value) {
+        setDecimal(BigDecimal.valueOf(value));
+        return this;
     }
 
     @Override
     public String toString() {
         if (loc == null) {
-            return String.format("(%sX%s)[s=%s,d=%s,r=%s]", parent.getId(), child.getId(), stringValue, decimalValue, id);
+            return String.format("(%sX%s)[s=%s,d=%s,r=%s]", parent.getId(), child.getId(), stringValue, decimal, id);
         }
-        return String.format("(%sX%s[%s])[s=%s,d=%s,r=%s]", parent.getId(), child.getId(), loc, stringValue, decimalValue, id);
+        return String.format("(%sX%s[%s])[s=%s,d=%s,r=%s]", parent.getId(), child.getId(), loc, stringValue, decimal, id);
     }
 }
 

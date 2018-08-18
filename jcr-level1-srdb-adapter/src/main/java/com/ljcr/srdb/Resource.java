@@ -1,5 +1,6 @@
 package com.ljcr.srdb;
 
+import com.ljcr.api.definitions.StandardType;
 import com.ljcr.api.definitions.StandardTypes;
 
 import javax.persistence.*;
@@ -87,7 +88,7 @@ public class Resource {
         return String.format("%s(t=%s,id=%s,v=%s)", reference, typeId, id, version);
     }
 
-    public static Resource newScalarType(StandardTypes.StandardScalar type, String reference) {
+    public static Resource newScalarType(StandardType type, String reference) {
         return new Resource(type.getNumericCode() * 1L, reference);
     }
 

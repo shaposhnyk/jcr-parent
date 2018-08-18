@@ -1,5 +1,6 @@
 package com.ljcr.srdb;
 
+import com.ljcr.api.definitions.StandardType;
 import com.ljcr.api.definitions.StandardTypes;
 import com.ljcr.srdb.mods.TypeDefinitionBuilder;
 import org.slf4j.Logger;
@@ -151,7 +152,7 @@ public class Application {
         log.info("-------------------------------]");
     }
 
-    private static Resource typeOf(StandardTypes.StandardScalar type) {
+    private static Resource typeOf(StandardType type) {
         return TypeDefinitionBuilder.resourceOf(type);
     }
 }

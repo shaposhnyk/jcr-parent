@@ -40,6 +40,10 @@ public interface TypeDefinition {
      */
     String getIdentifier();
 
+    default <T> T accept(StandardTypeVisitor<T> visitor, Object context) {
+        return visitor.visit(this, context);
+    }
+
     /**
      * Returns an array containing the property definitions of this node type.
      * This includes both those property definitions actually declared in this

@@ -1,8 +1,6 @@
 package com.ljcr.srdb.mods;
 
-import com.ljcr.api.definitions.PropertyDefinition;
-import com.ljcr.api.definitions.StandardTypes;
-import com.ljcr.api.definitions.TypeDefinition;
+import com.ljcr.api.definitions.*;
 import com.ljcr.srdb.*;
 
 import javax.annotation.Nullable;
@@ -67,11 +65,11 @@ public class TypeDefinitionBuilder {
         this.initialResource = res;
     }
 
-    public TypeDefinitionBuilder field(String fieldName, StandardTypes.StandardScalar type) {
+    public TypeDefinitionBuilder field(String fieldName, StandardType type) {
         return field(fieldName, type, -1);
     }
 
-    public TypeDefinitionBuilder field(String fieldName, StandardTypes.StandardScalar type, int limit) {
+    public TypeDefinitionBuilder field(String fieldName, StandardType type, int limit) {
         ResourceRelation field = newScalarField(resourceOf(type), fieldName);
         this.fields.add(new FieldDescriptor(fieldName, type)
                 .limitedTo(limit)
@@ -94,11 +92,11 @@ public class TypeDefinitionBuilder {
         return rel;
     }
 
-    public static Resource aliasOf(StandardTypes.StandardScalar type, String name) {
+    public static Resource aliasOf(StandardType type, String name) {
         return new Resource(null, type.getNumericCode() * 1L, name);
     }
 
-    public static Resource resourceOf(StandardTypes.StandardScalar type) {
+    public static Resource resourceOf(StandardType type) {
         return new Resource(1L * type.getNumericCode(), StandardTypes.TYPEDEF.getNumericCode() * 1L, type.getIdentifier());
     }
 
@@ -160,6 +158,11 @@ public class TypeDefinitionBuilder {
             }
 
             @Override
+            public <T> T accept(StandardTypeVisitor<T> visitor, Object context) {
+                return visitor.visit(this, context);
+            }
+
+            @Override
             public Resource getTypeResource() {
                 return typeRes;
             }
@@ -202,7 +205,7 @@ public class TypeDefinitionBuilder {
         if (type instanceof RelationalTypeDefinition) {
             typeRes = ((RelationalTypeDefinition) type).getTypeResource();
         } else {
-            typeRes = res.findById(((StandardTypes.StandardScalar) type).getNumericCode() * 1L)
+            typeRes = res.findById(((StandardType) type).getNumericCode() * 1L)
                     .orElseThrow(() -> new IllegalArgumentException("Unknown type: " + type));
         }
         String fullName = initialResource.getReference() + "." + fd.fieldName;

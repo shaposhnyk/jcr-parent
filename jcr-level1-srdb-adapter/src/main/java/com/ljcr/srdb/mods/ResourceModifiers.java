@@ -1,14 +1,17 @@
 package com.ljcr.srdb.mods;
 
 import com.ljcr.api.definitions.PropertyDefinition;
+import com.ljcr.api.definitions.StandardTypeVisitor;
 import com.ljcr.api.definitions.StandardTypes;
 import com.ljcr.srdb.RelationalTypeBuilder;
 import com.ljcr.srdb.Resource;
 import com.ljcr.srdb.ResourceRelation;
 import com.ljcr.srdb.TypeBuilder;
+import com.ljcr.srdb.mods.visitors.*;
 import org.apache.logging.log4j.util.TriConsumer;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 
@@ -85,13 +88,12 @@ public final class ResourceModifiers {
     }
 
     public static ResourceModifier newPrimitiveRelation(Resource fieldRes, PropertyDefinition field, String locale, Object value) {
-        ResourceRelation rel = new ResourceRelation();
-        rel.setChild(Objects.requireNonNull(fieldRes));
+        StandardTypeVisitor<ResourceRelation> factory = relationFactory();
 
-        BiConsumer<String, Object> validator = validatorByField(field);
-        validator.accept(locale, value);
-        TriConsumer<ResourceRelation, String, Object> setter = setterByField(field);
-        setter.accept(rel, locale, value);
+        ResourceRelation rel = field.getType()
+                .accept(factory, value)
+                .withLocale(locale)
+                .withChild(fieldRes);
 
         return new ResourceModifier() {
             @Override
@@ -115,6 +117,12 @@ public final class ResourceModifiers {
                 };
             }
         };
+    }
+
+    private static StandardTypeVisitor<ResourceRelation> relationFactory() {
+        StandardTypeVisitor<ResourceRelation> rawValueFactory = new ConditionalVisitorOrThrow<>(new RelationBuilderTypeSafeFilter(), new RelationBuilder());
+        StandardTypeVisitor<ResourceRelation> nullValueFactory = new ConditionalVisitorOrNull<>(new ValuePredicate(Objects::isNull), new RelationNullBuilder());
+        return new BatchingVisitor<>(Arrays.asList(nullValueFactory, rawValueFactory));
     }
 
     private static TriConsumer<ResourceRelation, String, Object> setterByField(PropertyDefinition field) {

@@ -10,8 +10,9 @@ create table res (
 
 create table rel (
     rid bigint default sq_rel_id.nextval not null,
-    child_id bigint,
-    parent_id bigint,
+    parent_id bigint not null,
+    field_id bigint not null,
+    value_id bigint null,
     l varchar(5), vstr varchar(255), vdec decimal(15,5),
     primary key (rid));
 
@@ -28,6 +29,7 @@ insert into res (id, type_id, ref, ver) values(18, 16, 'Array', 0);
 insert into res (id, type_id, ref, ver) values(19, 16, 'Map', 0);
 insert into res (id, type_id, ref, ver) values(65, 16, 'RepositoryRoot', 0);
 
-alter table rel add constraint res_id_child_id foreign key (child_id) references res;
 alter table rel add constraint res_id_parent_id foreign key (parent_id) references res;
+alter table rel add constraint res_id_field_id foreign key (field_id) references res;
+alter table rel add constraint res_id_value_id foreign key (value_id) references res;
 alter table res add constraint res_type_id_parent_id foreign key (type_id) references res;

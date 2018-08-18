@@ -2,6 +2,7 @@ package com.ljcr.dynamics;
 
 import com.ljcr.api.ImmutableObjectNode;
 import com.ljcr.api.definitions.ContainerTypeDefinition;
+import com.ljcr.api.definitions.StandardTypeVisitor;
 import org.apache.avro.Schema;
 
 import javax.annotation.Nullable;
