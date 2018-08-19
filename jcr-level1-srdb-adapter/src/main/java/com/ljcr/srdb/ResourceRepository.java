@@ -35,4 +35,11 @@ public interface ResourceRepository extends CrudRepository<Resource, Long> {
         Resource res = new Resource(StandardTypes.TYPEDEF.getNumericCode() * 1L, type.getIdentifier());
         return save(res);
     }
+
+    @Query("FROM Resource t where t.typeId = :typeId ORDER BY id ASC")
+    Iterable<Resource> findAllOfType(@Param("typeId") Long typeId);
+
+    default Iterable<Resource> findAllOfType(StandardType type) {
+        return findAllOfType(type.getNumericCode() * 1L);
+    }
 }

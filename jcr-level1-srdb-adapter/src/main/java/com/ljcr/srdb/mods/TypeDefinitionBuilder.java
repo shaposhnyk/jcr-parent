@@ -70,7 +70,6 @@ public class TypeDefinitionBuilder {
     }
 
     public TypeDefinitionBuilder field(String fieldName, StandardType type, int limit) {
-        ResourceRelation field = newScalarField(resourceOf(type), fieldName);
         this.fields.add(new FieldDescriptor(fieldName, type)
                 .limitedTo(limit)
         );
@@ -132,12 +131,12 @@ public class TypeDefinitionBuilder {
         final Map<String, PropertyDefinition> fieldsMap = new LinkedHashMap<>();
 
         if (referencable) {
-            PropertyDefinition p = createField(res, rels, new FieldDescriptor("reference", StandardTypes.NAME));
+            PropertyDefinition p = createField(res, rels, typeRes, new FieldDescriptor("reference", StandardTypes.NAME));
             fieldsMap.put("reference", p);
         }
 
         for (FieldDescriptor fd : fields) {
-            PropertyDefinition field = createField(res, rels, fd);
+            PropertyDefinition field = createField(res, rels, typeRes, fd);
             fieldsMap.put(fd.fieldName, field);
         }
         for (ContainerDescriptor cd : arrays) {
@@ -173,20 +172,20 @@ public class TypeDefinitionBuilder {
         return this;
     }
 
-    private PropertyDefinition createField(ResourceRepository res, RelationRepository rels, FieldDescriptor fd) {
+    private PropertyDefinition createField(ResourceRepository res, RelationRepository rels, Resource parentType, FieldDescriptor fd) {
         TypeDefinition type = fd.type;
-        final Resource typeRes;
+        final Resource fieldTypeRes;
         if (type instanceof RelationalTypeDefinition) {
-            typeRes = ((RelationalTypeDefinition) type).getTypeResource();
+            fieldTypeRes = ((RelationalTypeDefinition) type).getTypeResource();
         } else {
-            typeRes = res.findById(((StandardType) type).getNumericCode() * 1L)
+            fieldTypeRes = res.findById(((StandardType) type).getNumericCode() * 1L)
                     .orElseThrow(() -> new IllegalArgumentException("Unknown type: " + type));
         }
         String fullName = initialResource.getReference() + "." + fd.fieldName;
 
-        Resource fieldRes = res.save(new Resource(typeRes.getId(), fullName));
-        ResourceRelation rel = newScalarField(typeRes, fd.fieldName);
-        rel.setParent(typeRes);
+        Resource fieldRes = res.save(new Resource(fieldTypeRes.getId(), fullName));
+        ResourceRelation rel = newScalarField(fieldTypeRes, fd.fieldName);
+        rel.setParent(parentType);
         rel.setChild(fieldRes);
         rels.save(rel);
 

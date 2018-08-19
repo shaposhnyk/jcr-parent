@@ -115,19 +115,19 @@ public interface ObjectBuilder<T extends ObjectBuilder, R> {
      */
     default T addItem(ObjectBuilder builder) {
         TypeDefinition targetTypeDef = builder.getTypeDef(); // target type must be unique
-        List<PropertyDefinition> matchingTypes = getTypeDef().getPropertyDefinitions().stream()
+        List<PropertyDefinition> matchingFields = getTypeDef().getPropertyDefinitions().stream()
                 .filter(propDef -> targetTypeDef.equals(propDef.getType()) || targetTypeDef.equals(propDef.getType().getValueType()))
                 .limit(2)
                 .collect(toList());
 
-        if (matchingTypes.isEmpty()) {
+        if (matchingFields.isEmpty()) {
             throw new IllegalArgumentException("No field of type found: " + targetTypeDef);
-        } else if (matchingTypes.size() > 1) {
-            throw new IllegalArgumentException("Too many fields of type found: " + matchingTypes);
+        } else if (matchingFields.size() > 1) {
+            throw new IllegalArgumentException("Too many fields of type found: " + matchingFields);
         }
 
         // only one type found
-        return add(matchingTypes.get(0), builder);
+        return add(matchingFields.get(0), builder);
     }
 
     /**

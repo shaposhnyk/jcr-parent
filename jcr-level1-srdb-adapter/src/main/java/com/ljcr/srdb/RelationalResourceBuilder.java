@@ -1,6 +1,7 @@
 package com.ljcr.srdb;
 
 import com.ljcr.api.definitions.PropertyDefinition;
+import com.ljcr.api.definitions.StandardType;
 import com.ljcr.api.definitions.StandardTypes;
 import com.ljcr.api.definitions.TypeDefinition;
 import com.ljcr.srdb.mods.DatabaseOperationOnResources;
@@ -82,7 +83,7 @@ public class RelationalResourceBuilder implements ObjectBuilder<RelationalResour
     }
 
     public Resource buildResource() {
-        logger.info("Building   {}: {}", type, mainResourceModifier);
+        logger.debug("Building   {}: {}", type, mainResourceModifier);
         DatabaseOperationOnResources dbRes = new DatabaseOperationOnResources(resRepo, relsRepo);
 
         if (mainResourceModifier == null) { // we should generate random reference
@@ -95,14 +96,14 @@ public class RelationalResourceBuilder implements ObjectBuilder<RelationalResour
 
         Resource mainResource = (Resource) mainResourceModifier.getDbOperation()
                 .accept(dbRes);
-        logger.info("RES saved  {}: {}", type, mainResource);
+        logger.debug("RES saved  {}: {}", type, mainResource);
 
         for (ResourceModifier m : modifiers) {
             m.getDbOperation()
                     .completeRelation(mainResource)
                     .accept(dbRes);
         }
-        logger.info("RELS saved {}: {}", type, mainResource);
+        logger.debug("RELS saved {}: {}", type, mainResource);
 
         return mainResource;
     }
@@ -138,10 +139,23 @@ public class RelationalResourceBuilder implements ObjectBuilder<RelationalResour
     }
 
     private Resource findFieldResource(PropertyDefinition field) {
+        final Long typeId;
         if (field.getType() instanceof RelationalTypeDefinition) {
-            return ((RelationalTypeDefinition) field.getType()).getTypeResource();
+            typeId = ((RelationalTypeDefinition) field.getType()).getTypeResource().getId();
+        } else if (field.getType().getValueType() == null) {
+            typeId = ((StandardType) field.getType()).getNumericCode() * 1L;
+        } else { // value types
+            typeId = resRepo.findByReference(field.getType().getIdentifier(), StandardTypes.TYPEDEF)
+                    .orElseThrow(() ->
+                            new IllegalArgumentException("Cannot find field: " + field.getType().getIdentifier() + " of " + StandardTypes.TYPEDEF)
+                    ).getId();
         }
-        return resRepo.findByReference(field.getType().getIdentifier(), StandardTypes.TYPEDEF).get();
+
+        String ref = type.getIdentifier() + "." + field.getIdentifier();
+        return resRepo.findByReferenceAndType(ref, typeId)
+                .orElseThrow(() ->
+                        new IllegalArgumentException("Cannot find field: " + ref + " of " + typeId)
+                );
     }
 
     @Override
