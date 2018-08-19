@@ -317,8 +317,8 @@ public final class StandardTypes {
     public static final DateType DATE = new DateType();
 
     public static final class ArrayType extends ValueType {
-        ArrayType(TypeDefinition valueType) {
-            super(18, "Array", valueType);
+        ArrayType(String name, TypeDefinition valueType) {
+            super(18, name, valueType);
         }
 
         @Override
@@ -328,14 +328,15 @@ public final class StandardTypes {
     }
 
     public static ArrayType arrayOf(TypeDefinition valueType) {
-        return new ArrayType(valueType);
+        String name = ANYTYPE.equals(valueType) ? "Array" : "Array<" + valueType.getIdentifier() + ">";
+        return new ArrayType(name, valueType);
     }
 
     public static final ArrayType ARRAY = arrayOf(ANYTYPE);
 
     public static final class MapType extends ValueType {
-        MapType(TypeDefinition valueType) {
-            super(19, "Map", valueType);
+        MapType(String name, TypeDefinition valueType) {
+            super(19, name, valueType);
         }
 
         @Override
@@ -345,7 +346,8 @@ public final class StandardTypes {
     }
 
     public static MapType mapOf(TypeDefinition valueType) {
-        return new MapType(valueType);
+        String name = ANYTYPE.equals(valueType) ? "Map" : "Map<" + valueType.getIdentifier() + ">";
+        return new MapType(name, valueType);
     }
 
     public static final MapType MAP = mapOf(ANYTYPE);
@@ -463,6 +465,11 @@ public final class StandardTypes {
             public TypeDefinition getType() {
                 return type;
             }
+
+            @Override
+            public String toString() {
+                return String.format("%s[t=%s?]", fieldName, type);
+            }
         };
     }
 
@@ -484,6 +491,11 @@ public final class StandardTypes {
             @Override
             public boolean isMandatory() {
                 return true;
+            }
+
+            @Override
+            public String toString() {
+                return String.format("%s[t=%s!]", fieldName, type);
             }
         };
     }

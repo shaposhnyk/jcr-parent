@@ -13,34 +13,6 @@ public interface PropertyDefinition {
     TypeDefinition getType();
 
     /**
-     * Reports whether the item is to be automatically created when its parent
-     * node is created. If <code>true</code>, then this <code>PropertyDefinition</code>
-     * will necessarily not be a residual set definition but will specify an
-     * actual item name (in other words getReference() will not return "*").
-     * <p>
-     * An autocreated non-protected item must be created immediately when its
-     * parent node is created in the transient session space. Creation of
-     * autocreated non-protected items is never delayed until
-     * <code>save</code>.
-     * <p>
-     * <p>
-     * An autocreated protected item should be created immediately when its
-     * parent node is created in the transient session space. Creation of
-     * autocreated protected items should not be delayed until
-     * <code>save</code>, though doing so does not violate JCR compliance.
-     * <p>
-     * In implementations that support node type registration, if this
-     * <code>PropertyDefinition</code> object is actually a newly-created empty
-     * <code>PropertyDefinitionTemplate</code> or <code>NodeDefinitionTemplate</code>,
-     * then this method will return <code>false</code>.
-     *
-     * @return a <code>boolean</code>.
-     */
-    default boolean isAutoCreated() {
-        return false;
-    }
-
-    /**
      * Reports whether the item is mandatory. A mandatory item is one that, if
      * its parent node exists, must also exist.
      * <p>
@@ -67,6 +39,13 @@ public interface PropertyDefinition {
     }
 
     default boolean isFullTextSearchable() {
+        return false;
+    }
+
+    /**
+     * @return true if field is used as resource identifier
+     */
+    default boolean isIdentifier() {
         return false;
     }
 

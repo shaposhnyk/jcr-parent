@@ -48,7 +48,6 @@ public class TypeDefinitionBuilder {
         }
     }
 
-
     private final Resource initialResource;
 
     private List<FieldDescriptor> fields = new ArrayList<>();
@@ -215,19 +214,40 @@ public class TypeDefinitionBuilder {
         rel.setParent(typeRes);
         rel.setChild(fieldRes);
         rels.save(rel);
+
+        if (rel.getStringValue().equals("reference")) {
+            return new PropertyDefinition() {
+                @Override
+                public String getIdentifier() {
+                    return rel.getStringValue();
+                }
+
+                @Override
+                public TypeDefinition getType() {
+                    return type;
+                }
+
+                @Override
+                public boolean isIdentifier() {
+                    return true;
+                }
+            };
+        }
         return StandardTypes.propertyOf(rel.getStringValue(), type);
     }
 
     private PropertyDefinition createArrayField(ResourceRepository res, RelationRepository rels, Resource parentTypeRes, ContainerDescriptor cd) {
-        Resource tArr = res.findType(StandardTypes.ARRAY).get();
+        StandardTypes.ArrayType type = StandardTypes.arrayOf(cd.valueType);
+        Resource tArr = res.getOrCreateValueType(type);
         createArrayField(tArr, res, rels, parentTypeRes, cd);
-        return StandardTypes.propertyOf(cd.fieldName, StandardTypes.arrayOf(cd.valueType));
+        return StandardTypes.propertyOf(cd.fieldName, type);
     }
 
     private PropertyDefinition createMapField(ResourceRepository res, RelationRepository rels, Resource parentTypeRes, ContainerDescriptor cd) {
-        Resource tArr = res.findType(StandardTypes.MAP).get();
+        StandardTypes.MapType type = StandardTypes.mapOf(cd.valueType);
+        Resource tArr = res.getOrCreateValueType(type);
         createArrayField(tArr, res, rels, parentTypeRes, cd);
-        return StandardTypes.propertyOf(cd.fieldName, StandardTypes.mapOf(cd.valueType));
+        return StandardTypes.propertyOf(cd.fieldName, type);
     }
 
     private ResourceRelation createArrayField(Resource tArr, ResourceRepository res, RelationRepository rels, Resource parentTypeRes, ContainerDescriptor cd) {
@@ -241,5 +261,10 @@ public class TypeDefinitionBuilder {
         ResourceRelation savedRel = rels.save(rel);
 
         return savedRel;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("TypeBuilder[%s]", initialResource);
     }
 }

@@ -5,7 +5,7 @@ import com.ljcr.api.definitions.StandardTypes;
 import com.ljcr.api.definitions.TypeDefinition;
 import com.ljcr.srdb.ResourceRelation;
 
-public class RelationNullBuilder implements StandardTypeVisitor<ResourceRelation> {
+public class NullRelationFactory implements StandardTypeVisitor<ResourceRelation> {
 
     @Override
     public ResourceRelation visit(StandardTypes.StringType type, Object context) {

@@ -103,6 +103,8 @@ public class RelationBuilder implements StandardTypeVisitor<ResourceRelation> {
     public ResourceRelation visit(TypeDefinition type, Object context) {
         if ("LocalizedString".equals(type.getIdentifier())) {
             return visit(StandardTypes.STRING, context);
+        } else if (type.getIdentifier().endsWith("Ref")) {
+            return visit(StandardTypes.REFERENCE, context);
         }
 
         return new ResourceRelation()

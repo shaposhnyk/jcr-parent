@@ -1,5 +1,10 @@
 package com.ljcr.api.definitions;
 
+/**
+ * Contextual Visitor interface, which can be used for object convertions depending on their type
+ *
+ * @param <T> - visit result type
+ */
 public interface StandardTypeVisitor<T> {
     T visit(StandardTypes.StringType type, Object context);
 
@@ -33,5 +38,11 @@ public interface StandardTypeVisitor<T> {
 
     T visit(StandardTypes.MapType type, Object context);
 
+    /**
+     * All non standard types will pass by this method
+     * So you can plug-in your custom visitor here
+     *
+     * @return visit result
+     */
     T visit(TypeDefinition type, Object context);
 }

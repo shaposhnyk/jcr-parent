@@ -142,9 +142,9 @@ public class ResourceRelation {
     @Override
     public String toString() {
         if (loc == null) {
-            return String.format("(%sX%s)[s=%s,d=%s,r=%s]", parent.getId(), child.getId(), stringValue, decimal, id);
+            return String.format("(%sX%s)[s=%s,d=%s,r=%s,id=%s]", parent.getId(), child.getId(), stringValue, decimal, value == null ? null : value.getId(), id);
         }
-        return String.format("(%sX%s[%s])[s=%s,d=%s,r=%s]", parent.getId(), child.getId(), loc, stringValue, decimal, id);
+        return String.format("(%sX%s[%s])[s=%s,d=%s,r=%s,id=%s]", parent.getId(), child.getId(), loc, stringValue, decimal, value == null ? null : value.getId(), id);
     }
 }
 

@@ -11,6 +11,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.repository.CrudRepository;
 
+import java.math.BigDecimal;
+
 @SpringBootApplication
 public class Application {
 
@@ -31,31 +33,59 @@ public class Application {
     }
 
     private void initData(RelationalTypeDefinition rootType, ResourceRepository res, RelationRepository rels) {
-        TypeBuilder b = newBuilder(res, rels, rootType);
+        ObjectBuilder rootBuilder = newBuilder(res, rels, rootType);
 
-        TypeBuilder goldBuilder = b.newFieldTypeBuilder("colors")
+        ObjectBuilder goldBuilder = rootBuilder.newFieldItemBuilder("colors")
                 .setReference("gold")
                 .setLocalized("displayName", "en", "Gold")
                 .setLocalized("displayName", "fr", "Doré");
-        b.addItem(
-                goldBuilder
-        ).addItem(
-                b.newFieldTypeBuilder("colors")
-                        .setReference("silver")
-                        .setLocalized("displayName", "en", "Silver")
-                        .setLocalized("displayName", "fr", "Argenté")
-        ).addItem(
-                b.newFieldTypeBuilder("brands")
-                        .setReference("super")
-                        .setLocalized("name", "en", "Super")
-        ).build();
+
+        ObjectBuilder coolBuilder = rootBuilder.newFieldItemBuilder("brands");
+
+        coolBuilder
+                .setReference("cool")
+                .setLocalized("name", "en", "Cool Brand")
+                .addItem(
+                        coolBuilder.newFieldItemBuilder("shapes")
+                                .setReference("round")
+                )
+                .addItem(
+                        coolBuilder.newFieldItemBuilder("shapes")
+                                .setReference("square")
+                )
+                .add("products",
+                        coolBuilder.newFieldItemBuilder("products")
+                                .setReference("CL12000")
+                                .setLocalized("name", "en", "First product")
+                                .setLocalized("name", "fr", "Premiere produit")
+                                .set("stdPrice", new BigDecimal("999.95"))
+                                .set("isNew", Boolean.TRUE)
+                                .set("colorRef", "gold")
+                );
+
+
+        rootBuilder
+                .addItem(goldBuilder)
+                .addItem(
+                        rootBuilder.newFieldItemBuilder("colors")
+                                .setReference("silver")
+                                .setLocalized("displayName", "en", "Silver")
+                                .setLocalized("displayName", "fr", "Argenté")
+                )
+                .addItem(
+                        rootBuilder.newFieldItemBuilder("brands")
+                                .setReference("super")
+                                .setLocalized("name", "en", "Super")
+                )
+                .addItem(coolBuilder)
+                .build();
 
         showAll(res);
         showAll(rels);
     }
 
-    private TypeBuilder newBuilder(ResourceRepository res, RelationRepository rels, RelationalTypeDefinition rootType) {
-        return new RelationalTypeBuilder(res, rels, rootType);
+    private ObjectBuilder newBuilder(ResourceRepository res, RelationRepository rels, RelationalTypeDefinition rootType) {
+        return new RelationalResourceBuilder(res, rels, rootType);
     }
 
     public RelationalTypeDefinition initSchema(ResourceRepository res, RelationRepository rels) {
@@ -94,6 +124,12 @@ public class Application {
                 .build(res, rels);
 
         RelationalTypeDefinition tArticle = newTypeDef("Article")
+                .field("name", tLocString)
+                .field("description", tLocString)
+                .field("stdPrice", StandardTypes.DECIMAL)
+                .reference("shapeRef", tShape)
+                .reference("colorRef", tColor)
+                .field("isNew", StandardTypes.BOOLEAN)
                 .isReferencable()
                 .build(res, rels); // cross-referenced type
 
@@ -112,12 +148,7 @@ public class Application {
                 .build(res, rels);
 
         newTypeDef(tArticle)
-                .field("name", tLocString)
-                .field("description", tLocString)
-                .field("stdPrice", StandardTypes.DECIMAL)
                 .reference("brandRef", tBrand)
-                .reference("shapeRef", tShape)
-                .reference("colorRef", tColor)
                 .repeatable("bom", tBom)
                 .build(res, rels);
 

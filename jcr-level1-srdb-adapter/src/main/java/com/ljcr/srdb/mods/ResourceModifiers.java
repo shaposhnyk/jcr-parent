@@ -3,10 +3,10 @@ package com.ljcr.srdb.mods;
 import com.ljcr.api.definitions.PropertyDefinition;
 import com.ljcr.api.definitions.StandardTypeVisitor;
 import com.ljcr.api.definitions.StandardTypes;
-import com.ljcr.srdb.RelationalTypeBuilder;
+import com.ljcr.srdb.RelationalResourceBuilder;
 import com.ljcr.srdb.Resource;
 import com.ljcr.srdb.ResourceRelation;
-import com.ljcr.srdb.TypeBuilder;
+import com.ljcr.srdb.ObjectBuilder;
 import com.ljcr.srdb.mods.visitors.*;
 import org.apache.logging.log4j.util.TriConsumer;
 
@@ -121,7 +121,7 @@ public final class ResourceModifiers {
 
     private static StandardTypeVisitor<ResourceRelation> relationFactory() {
         StandardTypeVisitor<ResourceRelation> rawValueFactory = new ConditionalVisitorOrThrow<>(new RelationBuilderTypeSafeFilter(), new RelationBuilder());
-        StandardTypeVisitor<ResourceRelation> nullValueFactory = new ConditionalVisitorOrNull<>(new ValuePredicate(Objects::isNull), new RelationNullBuilder());
+        StandardTypeVisitor<ResourceRelation> nullValueFactory = new ConditionalVisitorOrNull<>(new ValuePredicate(Objects::isNull), new NullRelationFactory());
         return new BatchingVisitor<>(Arrays.asList(nullValueFactory, rawValueFactory));
     }
 
@@ -166,12 +166,14 @@ public final class ResourceModifiers {
         };
     }
 
-    public static ResourceModifier subType(Resource fieldRes, PropertyDefinition field, TypeBuilder builder) {
+    public static ResourceModifier subType(Resource fieldRes, PropertyDefinition field, ObjectBuilder builder) {
         return new ResourceModifier() {
             @Override
             public DatabaseOperation getDbOperation() {
-                Resource relationResource = ((RelationalTypeBuilder) builder).buildResource();
-                ResourceRelation rel = new ResourceRelation().withChild(relationResource);
+                Resource relationResource = ((RelationalResourceBuilder) builder).buildResource();
+                ResourceRelation rel = new ResourceRelation()
+                        .withChild(fieldRes)
+                        .withResourceValue(relationResource);
                 return new InsertOperation() {
                     @Override
                     public Object accept(DatabaseOperationVisitor r) {
