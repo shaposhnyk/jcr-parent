@@ -56,7 +56,7 @@ public class RelationBuilder implements StandardTypeVisitor<ResourceRelation> {
 
     @Override
     public ResourceRelation visit(StandardTypes.ReferenceType type, Object context) {
-        return new ResourceRelation().withStringValue((String) context);
+        return new ResourceRelation().withResourceValue((Resource) context);
     }
 
     @Override

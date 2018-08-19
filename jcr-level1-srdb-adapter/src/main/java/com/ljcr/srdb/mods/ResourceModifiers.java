@@ -2,18 +2,15 @@ package com.ljcr.srdb.mods;
 
 import com.ljcr.api.definitions.PropertyDefinition;
 import com.ljcr.api.definitions.StandardTypeVisitor;
-import com.ljcr.api.definitions.StandardTypes;
+import com.ljcr.srdb.ObjectBuilder;
 import com.ljcr.srdb.RelationalResourceBuilder;
 import com.ljcr.srdb.Resource;
 import com.ljcr.srdb.ResourceRelation;
-import com.ljcr.srdb.ObjectBuilder;
 import com.ljcr.srdb.mods.visitors.*;
-import org.apache.logging.log4j.util.TriConsumer;
 
-import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Objects;
-import java.util.function.BiConsumer;
+import java.util.function.Supplier;
 
 public final class ResourceModifiers {
     static ResourceModifier updateReference(Resource res, String reference) {
@@ -84,6 +81,11 @@ public final class ResourceModifiers {
                     }
                 };
             }
+
+            @Override
+            public String toString() {
+                return String.format("newResource[%s]", res);
+            }
         };
     }
 
@@ -125,47 +127,6 @@ public final class ResourceModifiers {
         return new BatchingVisitor<>(Arrays.asList(nullValueFactory, rawValueFactory));
     }
 
-    private static TriConsumer<ResourceRelation, String, Object> setterByField(PropertyDefinition field) {
-        String name = field.getType().getIdentifier();
-        if (StandardTypes.STRING.getIdentifier().equals(name) || StandardTypes.NAME.equals(name)) {
-            return (rel, l, v) -> rel
-                    .withStringValue((String) v)
-                    .withLocale(l);
-        } else if (StandardTypes.LONG.getIdentifier().equals(name)) {
-            return (rel, l, v) -> rel
-                    .withLongValue((Long) v)
-                    .withLocale(l);
-        } else if (StandardTypes.DECIMAL.getIdentifier().equals(name)) {
-            return (rel, l, v) -> {
-                final BigDecimal decimal;
-                if (v instanceof Long) {
-                    decimal = BigDecimal.valueOf((Long) v);
-                } else if (v instanceof BigDecimal) {
-                    decimal = (BigDecimal) v;
-                } else if (v == null) {
-                    decimal = null;
-                } else {
-                    decimal = new BigDecimal(v.toString());
-                }
-                rel
-                        .withDecimalValue(decimal)
-                        .withLocale(l);
-            };
-        } else if ("LocalizedString".equals(name)) {
-            return (rel, l, v) -> rel
-                    .withStringValue((String) v)
-                    .withLocale(l);
-        }
-
-        // or should be object type
-        throw new IllegalArgumentException("Unknown field type: " + name + " - " + field);
-    }
-
-    private static BiConsumer<String, Object> validatorByField(PropertyDefinition field) {
-        return (a, b) -> {
-        };
-    }
-
     public static ResourceModifier subType(Resource fieldRes, PropertyDefinition field, ObjectBuilder builder) {
         return new ResourceModifier() {
             @Override
@@ -188,6 +149,42 @@ public final class ResourceModifiers {
                     @Override
                     public DatabaseOperation completeRelation(Resource mainResource) {
                         rel.withParent(mainResource);
+                        return this;
+                    }
+                };
+            }
+        };
+    }
+
+    public static ResourceModifier newLazyRelation(Resource fieldRes, PropertyDefinition field, String locale, Supplier<Resource> valueSupplier) {
+        StandardTypeVisitor<ResourceRelation> factory = relationFactory();
+        Objects.requireNonNull(fieldRes);
+        Objects.requireNonNull(valueSupplier);
+
+        return new ResourceModifier() {
+            @Override
+            public DatabaseOperation getDbOperation() {
+                Resource value = valueSupplier.get();
+
+                ResourceRelation rel = field.getType()
+                        .accept(factory, value)
+                        .withLocale(locale)
+                        .withChild(fieldRes);
+
+                return new InsertOperation() {
+                    @Override
+                    public Object accept(DatabaseOperationVisitor r) {
+                        return r.visit(this);
+                    }
+
+                    @Override
+                    public ResourceRelation getRelation() {
+                        return rel;
+                    }
+
+                    @Override
+                    public DatabaseOperation completeRelation(Resource mainResource) {
+                        rel.setParent(mainResource);
                         return this;
                     }
                 };

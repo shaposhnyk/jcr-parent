@@ -6,16 +6,21 @@ import com.ljcr.api.definitions.TypeDefinition;
 import com.ljcr.srdb.mods.DatabaseOperationOnResources;
 import com.ljcr.srdb.mods.ResourceModifier;
 import com.ljcr.srdb.mods.ResourceModifiers;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.Random;
+import java.util.function.Supplier;
 
 /**
  * Resource builder
  */
 public class RelationalResourceBuilder implements ObjectBuilder<RelationalResourceBuilder, Resource> {
+    private static final Logger logger = LoggerFactory.getLogger(RelationalResourceBuilder.class);
+
     private final ResourceRepository resRepo;
     private final RelationRepository relsRepo;
     private final TypeDefinition type;
@@ -46,11 +51,12 @@ public class RelationalResourceBuilder implements ObjectBuilder<RelationalResour
             Resource resource = new Resource(findTypeId(type), (String) value);
             mainResourceModifier = ResourceModifiers.newResource(resource);
             return this;
-        } else if (value instanceof String && field.getType().isReferencable() && field.getType().getValueType() != null) {
+        } else if (value instanceof String && field.getType().getValueType() != null && field.getType().getValueType().isReferencable()) {
             TypeDefinition valueType = field.getType().getValueType();
-            Resource resource = resRepo.findByReference((String) value, valueType)
-                    .orElseThrow(() -> new IllegalArgumentException("Cannot find object '" + value + "' of type: " + valueType));
-            return addRelationModifier(field, null, resource);
+            return addLazyRelationModifier(field, null, () ->
+                    resRepo.findByReference((String) value, valueType)
+                            .orElseThrow(() -> new IllegalArgumentException("Cannot find object '" + value + "' of type: " + valueType))
+            );
         }
 
         return addRelationModifier(field, null, value);
@@ -76,6 +82,7 @@ public class RelationalResourceBuilder implements ObjectBuilder<RelationalResour
     }
 
     public Resource buildResource() {
+        logger.info("Building   {}: {}", type, mainResourceModifier);
         DatabaseOperationOnResources dbRes = new DatabaseOperationOnResources(resRepo, relsRepo);
 
         if (mainResourceModifier == null) { // we should generate random reference
@@ -88,12 +95,14 @@ public class RelationalResourceBuilder implements ObjectBuilder<RelationalResour
 
         Resource mainResource = (Resource) mainResourceModifier.getDbOperation()
                 .accept(dbRes);
+        logger.info("RES saved  {}: {}", type, mainResource);
 
         for (ResourceModifier m : modifiers) {
             m.getDbOperation()
                     .completeRelation(mainResource)
                     .accept(dbRes);
         }
+        logger.info("RELS saved {}: {}", type, mainResource);
 
         return mainResource;
     }
@@ -104,6 +113,10 @@ public class RelationalResourceBuilder implements ObjectBuilder<RelationalResour
     }
 
     //
+    private RelationalResourceBuilder addLazyRelationModifier(PropertyDefinition field, String locale, Supplier<Resource> value) {
+        Resource fieldRes = findFieldResource(field);
+        return addRelationModifier(ResourceModifiers.newLazyRelation(fieldRes, field, locale, value));
+    }
 
     private RelationalResourceBuilder addRelationModifier(PropertyDefinition field, String locale, Object value) {
         Resource fieldRes = findFieldResource(field);

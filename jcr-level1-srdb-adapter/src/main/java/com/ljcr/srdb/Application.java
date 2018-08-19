@@ -42,28 +42,6 @@ public class Application {
 
         ObjectBuilder coolBuilder = rootBuilder.newFieldItemBuilder("brands");
 
-        coolBuilder
-                .setReference("cool")
-                .setLocalized("name", "en", "Cool Brand")
-                .addItem(
-                        coolBuilder.newFieldItemBuilder("shapes")
-                                .setReference("round")
-                )
-                .addItem(
-                        coolBuilder.newFieldItemBuilder("shapes")
-                                .setReference("square")
-                )
-                .add("products",
-                        coolBuilder.newFieldItemBuilder("products")
-                                .setReference("CL12000")
-                                .setLocalized("name", "en", "First product")
-                                .setLocalized("name", "fr", "Premiere produit")
-                                .set("stdPrice", new BigDecimal("999.95"))
-                                .set("isNew", Boolean.TRUE)
-                                .set("colorRef", "gold")
-                );
-
-
         rootBuilder
                 .addItem(goldBuilder)
                 .addItem(
@@ -77,8 +55,30 @@ public class Application {
                                 .setReference("super")
                                 .setLocalized("name", "en", "Super")
                 )
-                .addItem(coolBuilder)
-                .build();
+                .addItem(coolBuilder
+                        .setReference("cool")
+                        .setLocalized("name", "en", "Cool Brand")
+                        .addItem(
+                                coolBuilder.newFieldItemBuilder("shapes")
+                                        .setReference("round")
+                        )
+                        .addItem(
+                                coolBuilder.newFieldItemBuilder("shapes")
+                                        .setReference("square")
+                        )
+                        .add("products",
+                                coolBuilder.newFieldItemBuilder("products")
+                                        .setReference("CL12000")
+                                        .setLocalized("name", "en", "First product")
+                                        .setLocalized("name", "fr", "Premiere produit")
+                                        .set("stdPrice", new BigDecimal("999.95"))
+                                        .set("isNew", Boolean.TRUE)
+                                        .set("colorRef", "gold")
+                        ))
+        ;
+
+        log.info("Building data");
+        rootBuilder.build();
 
         showAll(res);
         showAll(rels);

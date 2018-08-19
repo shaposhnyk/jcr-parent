@@ -3,8 +3,8 @@ package com.ljcr.srdb.mods;
 import com.ljcr.api.definitions.*;
 import com.ljcr.srdb.*;
 
-import javax.annotation.Nullable;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 public class TypeDefinitionBuilder {
 
@@ -49,12 +49,13 @@ public class TypeDefinitionBuilder {
     }
 
     private final Resource initialResource;
+    private final List<FieldDescriptor> fields = new ArrayList<>();
+    private final List<ContainerDescriptor> containers = new ArrayList<>(1);
+    private final List<ContainerDescriptor> arrays = new ArrayList<>(1);
 
-    private List<FieldDescriptor> fields = new ArrayList<>();
+    private RelationalTypeDefinition valueType = null;
+
     private boolean referencable = false;
-
-    private List<ContainerDescriptor> containers = new ArrayList<>(1);
-    private List<ContainerDescriptor> arrays = new ArrayList<>(1);
 
     public TypeDefinitionBuilder(String name) {
         this(Resource.newObjectType(name));
@@ -148,54 +149,28 @@ public class TypeDefinitionBuilder {
             fieldsMap.put(cd.fieldName, mapField);
         }
 
-        final RelationalTypeDefinition refType = buildRefType(res, rels, typeRes);
+        CompletableFuture<RelationalTypeDefinition> fRefType = new CompletableFuture<>();
 
-        return new RelationalTypeDefinition() {
-            @Override
-            public String getIdentifier() {
-                return typeName;
-            }
+        RelationalTypeDefinition typeDef = new RelationalTypeDefinitionImpl(typeName, typeRes, referencable, fRefType, fieldsMap, valueType);
+        RelationalTypeDefinition refType = buildRefType(res, rels, typeDef);
+        fRefType.complete(refType);
 
-            @Override
-            public <T> T accept(StandardTypeVisitor<T> visitor, Object context) {
-                return visitor.visit(this, context);
-            }
-
-            @Override
-            public Resource getTypeResource() {
-                return typeRes;
-            }
-
-            @Nullable
-            @Override
-            public RelationalTypeDefinition getReferenceType() {
-                return refType;
-            }
-
-            @Override
-            public Collection<PropertyDefinition> getDeclaredPropertyDefinitions() {
-                return fieldsMap.values();
-            }
-
-            @Override
-            public PropertyDefinition getFieldDefByName(String name) {
-                return fieldsMap.get(name);
-            }
-
-            @Override
-            public boolean isReferencable() {
-                return referencable;
-            }
-        };
+        return typeDef;
     }
 
-    private RelationalTypeDefinition buildRefType(ResourceRepository res, RelationRepository rels, Resource typeName) {
+    private RelationalTypeDefinition buildRefType(ResourceRepository res, RelationRepository rels, RelationalTypeDefinition valueType) {
         if (referencable) {
-            return new TypeDefinitionBuilder(typeName.getReference() + "Ref")
+            return new TypeDefinitionBuilder(valueType.getIdentifier() + "Ref")
+                    .valueType(valueType)
                     .field("reference", StandardTypes.REFERENCE)
                     .build(res, rels);
         }
         return null;
+    }
+
+    private TypeDefinitionBuilder valueType(RelationalTypeDefinition valueType) {
+        this.valueType = valueType;
+        return this;
     }
 
     private PropertyDefinition createField(ResourceRepository res, RelationRepository rels, FieldDescriptor fd) {
@@ -267,4 +242,5 @@ public class TypeDefinitionBuilder {
     public String toString() {
         return String.format("TypeBuilder[%s]", initialResource);
     }
+
 }
