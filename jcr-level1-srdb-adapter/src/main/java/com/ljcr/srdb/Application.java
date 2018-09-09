@@ -23,13 +23,20 @@ public class Application {
     }
 
     @Bean
-    public CommandLineRunner demo(ResourceRepository res, RelationRepository rels) {
-        return (args) -> demo(res, rels, args);
+    public RepositoryReader repoReader() {
+        return new RepositoryReader();
     }
 
-    public void demo(ResourceRepository res, RelationRepository rels, String... args) {
+    @Bean
+    public CommandLineRunner demo(ResourceRepository res, RelationRepository rels, RepositoryReader rdr) {
+        return (args) -> innerDemo(res, rels, rdr);
+    }
+
+    public void innerDemo(ResourceRepository res, RelationRepository rels, RepositoryReader rdr) {
         RelationalTypeDefinition rootType = initSchema(res, rels);
         initData(rootType, res, rels);
+
+        rdr.readSchema();
     }
 
     private void initData(RelationalTypeDefinition rootType, ResourceRepository res, RelationRepository rels) {
@@ -106,6 +113,17 @@ public class Application {
 
         res.save(TypeDefinitionBuilder.aliasOf(StandardTypes.STRING, "reference"));
 
+        TypeDefinitionBuilder fieldDef = newTypeDef(RepositoryReader.META_FIELD.getIdentifier());
+        RepositoryReader.META_FIELD.getPropertyDefinitions()
+                .forEach(f -> fieldDef.field(f.getIdentifier(), f.getType()));
+        fieldDef.build(res, rels);
+
+        TypeDefinitionBuilder typeDefBuilder = modTypeDef(typeDef);
+        //RepositoryReader.META_SCHEMA.getPropertyDefinitions()
+        //        .forEach(f -> typeDefBuilder.field(f.getIdentifier(), f.getType()));
+        //typeDefBuilder.build(res, rels);
+
+
         // base types should be already there
         RelationalTypeDefinition tLocString = newTypeDef("LocalizedString")
                 .field("locale", StandardTypes.STRING, 5)
@@ -163,6 +181,10 @@ public class Application {
         showAll(rels);
 
         return repo;
+    }
+
+    private TypeDefinitionBuilder modTypeDef(Resource tDef) {
+        return new TypeDefinitionBuilder(tDef);
     }
 
     private TypeDefinitionBuilder newTypeDef(RelationalTypeDefinition tArticle) {

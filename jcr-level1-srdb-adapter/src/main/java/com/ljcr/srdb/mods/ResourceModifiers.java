@@ -89,6 +89,45 @@ public final class ResourceModifiers {
         };
     }
 
+    public static ResourceModifier updateResource(Resource res) {
+        return new ResourceModifier() {
+            @Override
+            public DatabaseOperation getDbOperation() {
+                return new UpdateOperation() {
+                    @Override
+                    public Resource accept(DatabaseOperationVisitor r) {
+                        return (Resource) r.visit(this);
+                    }
+
+                    @Override
+                    public Resource getValue() {
+                        return res;
+                    }
+
+                    @Override
+                    public boolean isOnResource() {
+                        return true;
+                    }
+
+                    @Override
+                    public ResourceRelation getRelation() {
+                        return null;
+                    }
+
+                    @Override
+                    public DatabaseOperation completeRelation(Resource mainResource) {
+                        return null;
+                    }
+                };
+            }
+
+            @Override
+            public String toString() {
+                return String.format("newResource[%s]", res);
+            }
+        };
+    }
+
     public static ResourceModifier newPrimitiveRelation(Resource fieldRes, PropertyDefinition field, String locale, Object value) {
         StandardTypeVisitor<ResourceRelation> factory = relationFactory();
 
@@ -117,6 +156,11 @@ public final class ResourceModifiers {
                         return this;
                     }
                 };
+            }
+
+            @Override
+            public String toString() {
+                return String.format("pRelMod[%s]", rel);
             }
         };
     }
@@ -152,6 +196,11 @@ public final class ResourceModifiers {
                         return this;
                     }
                 };
+            }
+
+            @Override
+            public String toString() {
+                return String.format("relMod[field=%s]", field);
             }
         };
     }

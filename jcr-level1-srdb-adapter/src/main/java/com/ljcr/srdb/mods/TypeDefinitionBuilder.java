@@ -1,9 +1,15 @@
 package com.ljcr.srdb.mods;
 
-import com.ljcr.api.definitions.*;
+import com.ljcr.api.definitions.PropertyDefinition;
+import com.ljcr.api.definitions.StandardType;
+import com.ljcr.api.definitions.StandardTypes;
+import com.ljcr.api.definitions.TypeDefinition;
 import com.ljcr.srdb.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 public class TypeDefinitionBuilder {
@@ -79,6 +85,15 @@ public class TypeDefinitionBuilder {
     public TypeDefinitionBuilder field(String fieldName, RelationalTypeDefinition type) {
         this.fields.add(new FieldDescriptor(fieldName, type));
         return this;
+    }
+
+    public TypeDefinitionBuilder field(String name, TypeDefinition type) {
+        if (type instanceof StandardType) {
+            return field(name, (StandardType) type);
+        } else if (type instanceof RelationalTypeDefinition) {
+            return field(name, (RelationalTypeDefinition) type);
+        }
+        throw new IllegalArgumentException("Unknown type: " + type);
     }
 
     private ResourceRelation newScalarField(Resource fieldType, String fieldName) {

@@ -10,9 +10,46 @@ import java.math.BigDecimal;
 @Table(name = "rel")
 public class ResourceRelation {
 
+    private static final ResourceRelation EMPTY = new ResourceRelation() {
+        @Override
+        public void setChild(Resource child) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void setDecimal(BigDecimal decimal) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void setId(Long id) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void setParent(Resource parent) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void setLoc(String loc) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void setStringValue(String stringValue) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void setValue(Resource value) {
+            throw new UnsupportedOperationException();
+        }
+    };
+
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sq_rel_id")
-    @SequenceGenerator(name = "sq_rel_id", sequenceName = "sq_rel_id")
+    @SequenceGenerator(name = "sq_rel_id", sequenceName = "sq_rel_id", allocationSize = 1, initialValue = 1000)
     @Column(name = "rid", nullable = false)
     private Long id;
 
@@ -131,7 +168,7 @@ public class ResourceRelation {
     }
 
     public Long getLongValue() {
-        return decimal.longValue();
+        return decimal == null ? null : decimal.longValue();
     }
 
     public ResourceRelation withLongValue(Long value) {
@@ -145,6 +182,10 @@ public class ResourceRelation {
             return String.format("(%sX%s)[s=%s,d=%s,r=%s,id=%s]", parent.getId(), child.getId(), stringValue, decimal, value == null ? null : value.getId(), id);
         }
         return String.format("(%sX%s[%s])[s=%s,d=%s,r=%s,id=%s]", parent.getId(), child.getId(), loc, stringValue, decimal, value == null ? null : value.getId(), id);
+    }
+
+    public static ResourceRelation empty() {
+        return EMPTY;
     }
 }
 

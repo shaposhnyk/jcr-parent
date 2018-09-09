@@ -36,10 +36,34 @@ public interface ResourceRepository extends CrudRepository<Resource, Long> {
         return save(res);
     }
 
-    @Query("FROM Resource t where t.typeId = :typeId ORDER BY id ASC")
-    Iterable<Resource> findAllOfType(@Param("typeId") Long typeId);
+    @Query("FROM Resource R WHERE R.typeId = :typeId AND R.id <> R.typeId ORDER BY R.typeId, R.id, R.reference ASC")
+    Iterable<Resource> allOf(@Param("typeId") Long typeId);
 
-    default Iterable<Resource> findAllOfType(StandardType type) {
-        return findAllOfType(type.getNumericCode() * 1L);
+    @Query("FROM Resource R WHERE R.id IN (SELECT RR.child.id FROM ResourceRelation RR WHERE RR.parent.id IN (SELECT R2.id FROM Resource R2 WHERE (R2.typeId = :typeId AND R2.id <> R2.typeId))) ORDER BY R.reference, R.typeId, R.id")
+    Iterable<Resource> childrenOf(@Param("typeId") Long typeId);
+
+    @Query("FROM Resource R WHERE (R.typeId = :typeId AND R.id <> R.typeId AND R.id > 0) OR R.id IN (SELECT RR.child.id FROM ResourceRelation RR WHERE RR.parent.id IN (SELECT R2.id FROM Resource R2 WHERE (R2.typeId = :typeId AND R2.id <> R2.typeId))) ORDER BY R.reference, R.typeId, R.id")
+    Iterable<Resource> allOfAndTheirChildren(@Param("typeId") Long typeId);
+
+    default Iterable<Resource> allOf(StandardType type) {
+        return allOf(type.getNumericCode() * 1L);
+    }
+
+    default Iterable<Resource> childrenOf(StandardType type) {
+        return childrenOf(type.getNumericCode() * 1L);
+    }
+
+    default Iterable<Resource> allOfAndTheirChildren(StandardType type) {
+        return allOfAndTheirChildren(type.getNumericCode() * 1L);
+    }
+
+    @Query("FROM Resource R WHERE R.reference = :ref AND R.typeId IN (SELECT T.id FROM Resource T WHERE T.reference = :typeRef And T.typeId = :objTypeId)")
+    Optional<Resource> findObject(
+            @Param("ref") String objectReference,
+            @Param("typeRef") String typeName,
+            @Param("objTypeId") Long objectTypeId);
+
+    default Optional<Resource> findObject(String reference, TypeDefinition type) {
+        return findObject(reference, type.getIdentifier(), StandardTypes.TYPEDEF.getNumericCode() * 1L);
     }
 }

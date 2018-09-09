@@ -1,5 +1,5 @@
 create sequence sq_res_id start with 101 increment by 1;
-create sequence sq_rel_id start with 1100 increment by 1;
+create sequence sq_rel_id start with 1100 increment by 10;
 
 create table res (
     id bigint default sq_res_id.nextval not null,

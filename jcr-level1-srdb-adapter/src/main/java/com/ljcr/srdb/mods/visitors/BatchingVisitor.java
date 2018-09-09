@@ -4,15 +4,14 @@ import com.ljcr.api.definitions.StandardTypeVisitor;
 import com.ljcr.api.definitions.StandardTypes;
 import com.ljcr.api.definitions.TypeDefinition;
 
-import java.util.Collection;
-import java.util.Objects;
+import java.util.*;
 
 public class BatchingVisitor<T> implements StandardTypeVisitor<T> {
 
     private final Collection<StandardTypeVisitor<T>> delegates;
 
     public BatchingVisitor(Collection<StandardTypeVisitor<T>> delegates) {
-        this.delegates = Objects.requireNonNull(delegates );
+        this.delegates = Objects.requireNonNull(delegates);
     }
 
     @Override
@@ -200,5 +199,9 @@ public class BatchingVisitor<T> implements StandardTypeVisitor<T> {
             }
         }
         return null;
+    }
+
+    public static <T> StandardTypeVisitor<T> of(StandardTypeVisitor<T> source) {
+        return new BatchingVisitor<>(Arrays.asList(source));
     }
 }

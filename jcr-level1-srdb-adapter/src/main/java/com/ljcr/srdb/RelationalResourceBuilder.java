@@ -83,6 +83,29 @@ public class RelationalResourceBuilder implements ObjectBuilder<RelationalResour
     }
 
     public Resource buildResource() {
+        final Resource mainResource;
+        try {
+            mainResource = buildMainResource();
+        } catch (RuntimeException e) {
+            throw new RuntimeException("Failed to save main resource for: " + mainResourceModifier, e);
+        }
+
+        DatabaseOperationOnResources dbRes = new DatabaseOperationOnResources(resRepo, relsRepo);
+        for (ResourceModifier m : modifiers) {
+            try {
+                m.getDbOperation()
+                        .completeRelation(mainResource)
+                        .accept(dbRes);
+            } catch (RuntimeException e) {
+                throw new RuntimeException("Failed to save relation " + m + " on " + mainResourceModifier, e);
+            }
+        }
+        logger.debug("RELS saved {}: {}", type, mainResource);
+
+        return mainResource;
+    }
+
+    private Resource buildMainResource() {
         logger.debug("Building   {}: {}", type, mainResourceModifier);
         DatabaseOperationOnResources dbRes = new DatabaseOperationOnResources(resRepo, relsRepo);
 
@@ -90,21 +113,14 @@ public class RelationalResourceBuilder implements ObjectBuilder<RelationalResour
             if (type.isReferencable()) {
                 throw new IllegalArgumentException("Object must have reference set, but it was not");
             }
-            Resource resource = new Resource(findTypeId(type), String.valueOf(new Random().nextLong()));
+            long randomId = new Random().nextInt();
+            Resource resource = new Resource(findTypeId(type), String.valueOf(randomId < 0 ? -randomId : randomId));
             mainResourceModifier = ResourceModifiers.newResource(resource);
         }
 
         Resource mainResource = (Resource) mainResourceModifier.getDbOperation()
                 .accept(dbRes);
         logger.debug("RES saved  {}: {}", type, mainResource);
-
-        for (ResourceModifier m : modifiers) {
-            m.getDbOperation()
-                    .completeRelation(mainResource)
-                    .accept(dbRes);
-        }
-        logger.debug("RELS saved {}: {}", type, mainResource);
-
         return mainResource;
     }
 
