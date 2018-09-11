@@ -5,6 +5,7 @@ import com.ljcr.api.definitions.StandardTypes;
 import com.ljcr.srdb.mods.TypeDefinitionBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -18,21 +19,26 @@ public class Application {
 
     private static final Logger log = LoggerFactory.getLogger(Application.class);
 
+    @Autowired
+    RelationRepository rels;
+    @Autowired
+    ResourceRepository res;
+
     public static void main(String[] args) {
         SpringApplication.run(Application.class);
     }
 
     @Bean
     public RepositoryReader repoReader() {
-        return new RepositoryReader();
+        return new RepositoryReader(res, rels);
     }
 
     @Bean
-    public CommandLineRunner demo(ResourceRepository res, RelationRepository rels, RepositoryReader rdr) {
-        return (args) -> innerDemo(res, rels, rdr);
+    public CommandLineRunner demo(RepositoryReader rdr) {
+        return (args) -> innerDemo(rdr);
     }
 
-    public void innerDemo(ResourceRepository res, RelationRepository rels, RepositoryReader rdr) {
+    public void innerDemo(RepositoryReader rdr) {
         RelationalTypeDefinition rootType = initSchema(res, rels);
         initData(rootType, res, rels);
 

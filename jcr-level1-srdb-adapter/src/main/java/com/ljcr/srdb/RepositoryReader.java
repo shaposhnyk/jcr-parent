@@ -7,14 +7,15 @@ import com.ljcr.api.definitions.StandardTypeVisitor;
 import com.ljcr.api.definitions.StandardTypes;
 import com.ljcr.api.definitions.TypeDefinition;
 import com.ljcr.api.exceptions.ItemNotFoundException;
-import com.ljcr.srdb.mods.visitors.*;
-import com.ljcr.srdb.readers.ImmutableResource;
+import com.ljcr.srdb.mods.visitors.ChainingVisitor;
+import com.ljcr.srdb.mods.visitors.ConditionalVisitorOrThrow;
+import com.ljcr.srdb.mods.visitors.ValuePredicate;
 import com.ljcr.srdb.readers.ImmutableEmptyResource;
+import com.ljcr.srdb.readers.ImmutableResource;
 import com.ljcr.srdb.readers.RelationToValueVisitor;
 import com.ljcr.srdb.readers.SimpleValueNodeFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;
 import java.util.function.Function;
@@ -30,11 +31,14 @@ public class RepositoryReader {
     static final TypeDefinition META_FIELD = new FieldSchema();
     static final TypeSchema META_SCHEMA = metaSchemaOf(META_FIELD);
 
-    @Autowired
-    ResourceRepository res;
+    private final ResourceRepository res;
 
-    @Autowired
-    RelationRepository rels;
+    private final RelationRepository rels;
+
+    public RepositoryReader(ResourceRepository res, RelationRepository rels) {
+        this.res = res;
+        this.rels = rels;
+    }
 
     /**
      * Reads whole relational repository in memory and returns its root node
@@ -93,7 +97,7 @@ public class RepositoryReader {
         return null;
     }
 
-    ImmutableNode findResource(String reference, TypeDefinition type) {
+    public ImmutableNode findResource(String reference, TypeDefinition type) {
         Resource objResource = res.findObject(reference, type)
                 .orElseThrow(() -> new ItemNotFoundException("ref=" + reference + ",type=" + type));
 
@@ -112,7 +116,7 @@ public class RepositoryReader {
         return new ImmutableResource(type, objResource, simplePropertiesFactory);
     }
 
-    ImmutableNode findResourceLazy(String reference, TypeDefinition type) {
+    public ImmutableNode findResourceLazy(String reference, TypeDefinition type) {
         Resource objResource = res.findObject(reference, type)
                 .orElseThrow(() -> new ItemNotFoundException("ref=" + reference + ",type=" + type));
 
