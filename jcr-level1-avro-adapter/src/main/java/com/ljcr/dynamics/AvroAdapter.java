@@ -83,7 +83,7 @@ public class AvroAdapter {
 
     static ImmutableNode nodeOf(Schema s, Object obj, String fieldName) {
         if (obj == null) {
-            return new AvroImmutableValue(null, fieldName, s);
+            return new AvroImmutableScalar(null, fieldName, s);
         }
 
         if (obj instanceof GenericRecord) {
@@ -91,7 +91,7 @@ public class AvroAdapter {
         } else if (obj instanceof GenericArray<?>) {
             return new AvroImmutableArrayNode((GenericArray) obj, fieldName);
         } else if (obj instanceof Utf8) {
-            return new AvroImmutableValue(((Utf8) obj).toString(), fieldName, s);
+            return new AvroImmutableScalar(((Utf8) obj).toString(), fieldName, s);
         } else if (obj instanceof Map<?, ?>) {
             if (((Map) obj).isEmpty() || ((Map<?, ?>) obj).entrySet().iterator().next().getKey() instanceof String) {
                 return AvroImmutableMapNode.of((Map<String, Object>) obj, fieldName);
@@ -99,7 +99,7 @@ public class AvroAdapter {
 
             return AvroImmutableMapNode.ofUtf8((Map<Utf8, Object>) obj, fieldName);
         }
-        return new AvroImmutableValue(obj, fieldName, s);
+        return new AvroImmutableScalar(obj, fieldName, s);
     }
 
     public static ImmutableNode referencableNodeOf(Object obj, String reference) {

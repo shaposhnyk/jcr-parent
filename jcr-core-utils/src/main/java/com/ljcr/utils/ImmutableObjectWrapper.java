@@ -137,7 +137,7 @@ public class ImmutableObjectWrapper implements ImmutableObjectNode {
     }
 
     @Override
-    public ImmutableBinaryValue asBinaryValue() {
+    public ImmutableBinaryScalar asBinaryValue() {
         return delegate.asBinaryValue();
     }
 

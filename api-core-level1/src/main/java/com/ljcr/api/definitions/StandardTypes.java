@@ -286,9 +286,9 @@ public final class StandardTypes {
     public static final DecimalType DECIMAL = new DecimalType();
 
     // end of standard JCR types
-    public static final class TypeDefinitionType extends StandardType {
-        TypeDefinitionType() {
-            super(16, "TypeDef");
+    public static class TypeDefinitionType extends StandardType {
+        public TypeDefinitionType(String name) {
+            super(16, name);
         }
 
         @Override
@@ -297,7 +297,9 @@ public final class StandardTypes {
         }
     }
 
-    public static final TypeDefinitionType TYPEDEF = new TypeDefinitionType();
+    public static final TypeDefinitionType FIELDDEF = new TypeDefinitionType("FieldDef");
+
+    public static final TypeDefinitionType TYPEDEF = new TypeDefinitionType("TypeDef");
 
     public static final class DateType extends StandardType {
         DateType() {
@@ -372,7 +374,7 @@ public final class StandardTypes {
         }
     };
 
-    private static final List<TypeDefinition> STANDARD_TYPES = Arrays.asList(
+    private static final List<StandardType> STANDARD_TYPES = Arrays.asList(
             STRING,
             BINARY,
             LONG,
@@ -382,16 +384,27 @@ public final class StandardTypes {
             BOOLEAN,
             URI,
             PATH,
-            NAME,
-            // special types
-            REFERENCE, // reference to another object
-            WEAKREFERENCE,
+            NAME
+    );
+
+    private static final List<StandardType> SPECIAL_TYPES = Arrays.asList(
+            REFERENCE, // reference to another object. asserted to be valid
+            WEAKREFERENCE, // reference to another object (object may be unexistent)
             ARRAY,
             MAP,
             TYPEDEF,
+            FIELDDEF,
             ANYTYPE,
             NULL
     );
+
+    public static List<StandardType> getSpecialTypes() {
+        return SPECIAL_TYPES;
+    }
+
+    public static List<StandardType> getPrimitiveTypes() {
+        return STANDARD_TYPES;
+    }
 
     /**
      * Returns the name of the specified <code>type</code>, as used in

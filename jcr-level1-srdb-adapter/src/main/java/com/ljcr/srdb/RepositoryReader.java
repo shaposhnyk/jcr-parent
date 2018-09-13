@@ -1,19 +1,14 @@
 package com.ljcr.srdb;
 
 import com.ljcr.api.ImmutableNode;
-import com.ljcr.api.ImmutableValue;
+import com.ljcr.api.ImmutableScalar;
 import com.ljcr.api.definitions.PropertyDefinition;
 import com.ljcr.api.definitions.StandardTypeVisitor;
 import com.ljcr.api.definitions.StandardTypes;
 import com.ljcr.api.definitions.TypeDefinition;
 import com.ljcr.api.exceptions.ItemNotFoundException;
-import com.ljcr.srdb.mods.visitors.ChainingVisitor;
-import com.ljcr.srdb.mods.visitors.ConditionalVisitorOrThrow;
-import com.ljcr.srdb.mods.visitors.ValuePredicate;
-import com.ljcr.srdb.readers.ImmutableEmptyResource;
-import com.ljcr.srdb.readers.ImmutableResource;
-import com.ljcr.srdb.readers.RelationToValueVisitor;
-import com.ljcr.srdb.readers.SimpleValueNodeFactory;
+import com.ljcr.srdb.mods.visitors.*;
+import com.ljcr.srdb.readers.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -103,17 +98,53 @@ public class RepositoryReader {
 
         Iterable<ResourceRelation> relations = rels.allRelationsOfRes(objResource);
         Map<String, List<ResourceRelation>> relationMap = StreamSupport.stream(relations.spliterator(), false)
-                .collect(groupingBy((ResourceRelation r) -> r.getChild().getReference(), toList()));
+                .collect(groupingBy((ResourceRelation r) -> fieldNameOf(r.getChild()),
+                        //.getReference(),
+                        toList()));
+
+        TypeDefinition actualType = actualTypeOf(reference, type);
 
         if (relationMap.isEmpty()) {
-            return new ImmutableEmptyResource(type, objResource);
+            return new ImmutableResourceNoRel(actualType, objResource);
         }
 
-        StandardTypeVisitor<ImmutableValue> simpleTypesFactory = eagerRelationFactory();
-        RelationalPropertyFactory simplePropertiesFactory = p -> p.getType()
-                .accept(simpleTypesFactory, relationMap.get(p.getIdentifier()));
+        StandardTypeVisitor<ImmutableScalar> simpleTypesFactory = eagerRelationFactory();
+        PropertyFactory simplePropertiesFactory = p -> getValueFromMap(simpleTypesFactory, p, relationMap);
 
-        return new ImmutableResource(type, objResource, simplePropertiesFactory);
+        ImmutableRelations imRelations = new ImmutableRelations(actualType, simplePropertiesFactory);
+        ImmutableResourceNoRel imReferencable = new ImmutableResourceNoRel(referencableType(), objResource);
+        return new ImmutableResourceWithComplement(imReferencable, imRelations);
+    }
+
+    private TypeDefinition referencableType() {
+        return null;
+    }
+
+    private String fieldNameOf(Resource child) {
+        String reference = child.getReference();
+        // is this false?
+        int idx = reference.indexOf(".");
+        return idx > 0 ? reference.substring(idx + 1) : reference;
+    }
+
+    private ImmutableScalar getValueFromMap(StandardTypeVisitor<ImmutableScalar> factory, PropertyDefinition p, Map<String, List<ResourceRelation>> relationMap) {
+        try {
+            final String identifier = p.getIdentifier();
+            final List<ResourceRelation> context = relationMap.get(identifier);
+            return p.getType()
+                    .accept(factory, context);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Failed to fetch " + p + " from map: " + relationMap, e);
+        } catch (RuntimeException e) {
+            throw new IllegalStateException("Failed to fetch " + p + " from map: " + relationMap, e);
+        }
+    }
+
+    private TypeDefinition actualTypeOf(String reference, TypeDefinition type) {
+        if (type.equals(StandardTypes.TYPEDEF)) {
+            return META_SCHEMA;
+        }
+        return type;
     }
 
     public ImmutableNode findResourceLazy(String reference, TypeDefinition type) {
@@ -121,14 +152,14 @@ public class RepositoryReader {
                 .orElseThrow(() -> new ItemNotFoundException("ref=" + reference + ",type=" + type));
 
 
-        StandardTypeVisitor<ImmutableValue> simpleTypesFactory = lazyRelationFactory();
-        RelationalPropertyFactory simplePropertiesFactory = p -> {
+        StandardTypeVisitor<ImmutableScalar> simpleTypesFactory = lazyRelationFactory();
+        PropertyFactory simplePropertiesFactory = p -> {
             Iterable<ResourceRelation> relations = rels.relationsBetween(objResource, p);
             return p.getType()
                     .accept(simpleTypesFactory, relations);
         };
 
-        return new ImmutableResource(type, objResource, simplePropertiesFactory);
+        return new ImmutableRelations(type, simplePropertiesFactory);
     }
 
     /**
@@ -137,13 +168,40 @@ public class RepositoryReader {
      *
      * @return
      */
-    private StandardTypeVisitor<ImmutableValue> eagerRelationFactory() {
+    private StandardTypeVisitor<ImmutableScalar> eagerRelationFactory() {
+        StandardTypeVisitor<Boolean> nullFilter = new ValuePredicate(obj -> obj == null);
         StandardTypeVisitor<Boolean> typeFilter = new ValuePredicate(obj -> obj instanceof ResourceRelation || obj instanceof Collection<?>);
-        StandardTypeVisitor<Object> relationToObject = new RelationToValueVisitor();
-        StandardTypeVisitor<ImmutableValue> objectToValue = new SimpleValueNodeFactory();
-        StandardTypeVisitor<ImmutableValue> relationsToValue = new ChainingVisitor<>(relationToObject, objectToValue);
-        StandardTypeVisitor<ImmutableValue> compositeVisitor = new ConditionalVisitorOrThrow<>(typeFilter, relationsToValue);
-        return compositeVisitor;
+
+        StandardTypeVisitor<Object> relationToPrimitive = new RelationToValueVisitor();
+        StandardTypeVisitor<Object> relationToObject = new DelegatingVisitor<Object>(relationToPrimitive) {
+            @Override
+            public Object visit(StandardTypes.TypeDefinitionType type, Object context) {
+                TypeDefinition fieldDef = actualTypeOf(type.getIdentifier(), type);
+                Resource objResource = ((ResourceRelation) context).getChild();
+                return new ImmutableResourceNoRel(fieldDef, objResource);
+            }
+
+            @Override
+            public List<Object> visit(StandardTypes.ArrayType type, Object context) {
+                TypeDefinition valueType = type.getValueType();
+                Collection<ResourceRelation> res = (Collection<ResourceRelation>) context;
+                if (res == null || res.isEmpty()) {
+                    return Collections.emptyList();
+                }
+                return res.stream()
+                        .map(rel -> valueType.accept(this, rel))
+                        .collect(toList());
+            }
+        };
+
+        StandardTypeVisitor<ImmutableScalar> objectToValue = new SimpleValueNodeFactory();
+        StandardTypeVisitor<ImmutableScalar> relationsToValue = new ChainingVisitor<>(relationToObject, objectToValue);
+        StandardTypeVisitor<ImmutableScalar> ifMatchConvert = new ConditionalVisitorOrThrow<>(typeFilter, relationsToValue);
+
+        StandardTypeVisitor<ImmutableScalar> nullFactory = new NullValueFactory<>();
+        StandardTypeVisitor<ImmutableScalar> nullOrValue = new ConditionalVisitorOrElse<>(nullFilter, nullFactory, ifMatchConvert);
+
+        return nullOrValue;
     }
 
     /**
@@ -152,12 +210,12 @@ public class RepositoryReader {
      *
      * @return
      */
-    private StandardTypeVisitor<ImmutableValue> lazyRelationFactory() {
+    private StandardTypeVisitor<ImmutableScalar> lazyRelationFactory() {
         StandardTypeVisitor<Boolean> typeFilter = new ValuePredicate(obj -> obj instanceof Iterable<?>);
         StandardTypeVisitor<Object> relationToObject = new RelationToValueVisitor();
-        StandardTypeVisitor<ImmutableValue> objectToValue = new SimpleValueNodeFactory();
-        StandardTypeVisitor<ImmutableValue> relationsToValue = new ChainingVisitor<>(relationToObject, objectToValue);
-        StandardTypeVisitor<ImmutableValue> compositeVisitor = new ConditionalVisitorOrThrow<>(typeFilter, relationsToValue);
+        StandardTypeVisitor<ImmutableScalar> objectToValue = new SimpleValueNodeFactory();
+        StandardTypeVisitor<ImmutableScalar> relationsToValue = new ChainingVisitor<>(relationToObject, objectToValue);
+        StandardTypeVisitor<ImmutableScalar> compositeVisitor = new ConditionalVisitorOrThrow<>(typeFilter, relationsToValue);
         return compositeVisitor;
     }
 }

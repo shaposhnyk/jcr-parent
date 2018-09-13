@@ -100,7 +100,7 @@ class FsFile(val root: Path, val p: Path) : ImmutableObjectNode {
 
     override fun getItem(fieldName: String): ImmutableNode? {
         val realPath = root.resolve(Paths.get("/").relativize(p))
-        return if ("fileContent" == fieldName) GenericProperty("fileContent", p, FileContentValue(realPath))
+        return if ("fileContent" == fieldName) GenericProperty("fileContent", p, FileContentScalar(realPath))
         else GenericProperty(fieldName, p, Files.getAttribute(realPath, fieldName))
     }
 
@@ -140,7 +140,9 @@ data class GenericProperty(val fieldName: String, val p: Path, val objValue: Any
     }
 }
 
-data class FileContentValue(val p: Path) : ImmutableBinaryValue {
+data class FileContentScalar(val p: Path) : ImmutableBinaryScalar {
+    override fun getTypeDefinition(): TypeDefinition = StandardTypes.BINARY;
+
     override fun asLong(): Long = throw UnsupportedRepositoryOperationException()
 
     override fun asDouble(): Double = throw UnsupportedRepositoryOperationException()
@@ -153,7 +155,7 @@ data class FileContentValue(val p: Path) : ImmutableBinaryValue {
 
     override fun asBoolean(): Boolean = throw UnsupportedRepositoryOperationException()
 
-    override fun asBinaryValue(): ImmutableBinaryValue = this
+    override fun asBinaryValue(): ImmutableBinaryScalar = this
 
     override fun asObjectNode(): ImmutableObjectNode = throw UnsupportedRepositoryOperationException()
 

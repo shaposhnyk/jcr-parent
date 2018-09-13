@@ -2,12 +2,11 @@ package com.ljcr.srdb.readers;
 
 import com.ljcr.api.ImmutableItemVisitor;
 import com.ljcr.api.ImmutableNode;
-import com.ljcr.api.ImmutableValue;
+import com.ljcr.api.ImmutableScalar;
 import com.ljcr.api.definitions.PropertyDefinition;
 import com.ljcr.api.definitions.TypeDefinition;
 import com.ljcr.api.exceptions.PathNotFoundException;
-import com.ljcr.srdb.RelationalPropertyFactory;
-import com.ljcr.srdb.Resource;
+import com.ljcr.srdb.PropertyFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,33 +17,27 @@ import java.util.stream.Stream;
 /**
  * Default immutable resource, working with complete type information
  */
-public class ImmutableResource implements ImmutableNode {
+public class ImmutableRelations implements ImmutableNode {
 
-    private static final Logger logger = LoggerFactory.getLogger(ImmutableResource.class);
+    private static final Logger logger = LoggerFactory.getLogger(ImmutableRelations.class);
 
     private final TypeDefinition type;
-    private final Resource res;
-    private final RelationalPropertyFactory factory;
+    private final PropertyFactory factory;
 
-    public ImmutableResource(
-            TypeDefinition type,
-            Resource res,
-            RelationalPropertyFactory factory
-    ) {
+    public ImmutableRelations(TypeDefinition type, PropertyFactory factory) {
         this.type = type;
-        this.res = res;
         this.factory = factory;
-    }
-
-    @Nonnull
-    @Override
-    public String getName() {
-        return res.getReference();
     }
 
     @Nullable
     @Override
     public Object getValue() {
+        return null;
+    }
+
+    @Nonnull
+    @Override
+    public String getName() {
         return null;
     }
 
@@ -56,12 +49,12 @@ public class ImmutableResource implements ImmutableNode {
             throw new IllegalArgumentException("Unknown field: " + fieldName + " on " + getTypeDefinition());
         }
 
-        ImmutableValue value = factory.getValue(field);
+        ImmutableScalar value = factory.getValue(field);
         return nodeOf(field, value);
     }
 
-    private ImmutableNode nodeOf(PropertyDefinition field, ImmutableValue value) {
-        return new ImmutableValueNodeWrapper(field.getIdentifier(), value);
+    private ImmutableNode nodeOf(PropertyDefinition field, ImmutableScalar value) {
+        return new ImmutableScalarNodeWrapper(field.getIdentifier(), value);
     }
 
     @Override

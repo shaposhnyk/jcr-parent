@@ -110,8 +110,8 @@ public class ImmutableNodeWrapper implements ImmutableNode {
     }
 
     @Override
-    public ImmutableBinaryValue asBinaryValue() {
-        return (ImmutableBinaryValue) this;
+    public ImmutableBinaryScalar asBinaryValue() {
+        return (ImmutableBinaryScalar) this;
     }
 
     @Override

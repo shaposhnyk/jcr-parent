@@ -4,6 +4,7 @@ package com.ljcr.api;
 import com.ljcr.api.definitions.TypeDefinition;
 import com.ljcr.api.exceptions.PathNotFoundException;
 import com.ljcr.api.exceptions.RepositoryException;
+import com.ljcr.api.exceptions.UnsupportedRepositoryOperationException;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -13,7 +14,7 @@ import java.util.stream.Stream;
  * The <code>ImmutableNode</code> is the base read-only item of hierarchical key-value repository.
  */
 @Nonnull
-public interface ImmutableNode extends ImmutableValue {
+public interface ImmutableNode extends ImmutableScalar {
 
     /**
      * Returns the name of this <code>ImmutableNode</code> in qualified form. If this
@@ -26,15 +27,6 @@ public interface ImmutableNode extends ImmutableValue {
      */
     @Nonnull
     String getName();
-
-    /**
-     * Returns the value associated with this key
-     *
-     * @return the value associated with this key
-     */
-    @Override
-    @Nullable
-    Object getValue();
 
     /**
      * Returns the node at <code>fieldName</code> relative to this node.
@@ -117,4 +109,15 @@ public interface ImmutableNode extends ImmutableValue {
      */
     @Nullable
     <T> T accept(@Nonnull ImmutableItemVisitor<T> visitor);
+
+    /**
+     * Returns the value associated with this key
+     *
+     * @return the value associated with this key
+     */
+    @Override
+    @Nullable
+    default Object getValue() {
+        throw new UnsupportedRepositoryOperationException();
+    }
 }

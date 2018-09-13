@@ -10,11 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
-
-import static java.util.stream.Collectors.toList;
 
 public class RelationToValueVisitor extends DelegatingVisitor<Object>
         implements StandardTypeVisitor<Object> {
@@ -72,18 +68,6 @@ public class RelationToValueVisitor extends DelegatingVisitor<Object>
         return scalar
                 .map(rel -> rel.getDecimalValue())
                 .orElse(null);
-    }
-
-    @Override
-    public List<Object> visit(StandardTypes.ArrayType type, Object context) {
-        TypeDefinition valueType = type.getValueType();
-        Collection<ResourceRelation> res = (Collection<ResourceRelation>) context;
-        if (res == null || res.isEmpty()) {
-            return Collections.emptyList();
-        }
-        return res.stream()
-                .map(rel -> valueType.accept(this, rel))
-                .collect(toList());
     }
 
     private Optional<ResourceRelation> extractScalar(TypeDefinition type, Object context) {

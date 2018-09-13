@@ -15,7 +15,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 public class JsonImmutableObjectNode extends JsonImmutableNode implements ImmutableObjectNode {
-    public JsonImmutableObjectNode(String p, JsonImmutableValue jsonImmutableValue, TypeDefinition type) {
+    public JsonImmutableObjectNode(String p, JsonImmutableScalar jsonImmutableValue, TypeDefinition type) {
         super(p, jsonImmutableValue, type);
     }
 

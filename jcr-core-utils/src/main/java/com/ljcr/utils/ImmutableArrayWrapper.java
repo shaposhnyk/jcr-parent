@@ -115,7 +115,7 @@ public class ImmutableArrayWrapper implements ImmutableArrayNode {
     }
 
     @Override
-    public ImmutableBinaryValue asBinaryValue() {
+    public ImmutableBinaryScalar asBinaryValue() {
         return delegate.asBinaryValue();
     }
 

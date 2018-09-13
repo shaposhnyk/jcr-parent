@@ -67,7 +67,7 @@ class AvroImmutableObjectNode implements ImmutableObjectNode {
 
             Object obj = rootRecord.get(field.name());
             AvroTypeDefinition type = new AvroTypeDefinition(field.schema(), field.doc().substring("ref:".length()) + "Ref");
-            return new AvroImmutableValue(obj, field.name(), () -> type);
+            return new AvroImmutableScalar(obj, field.name(), () -> type);
         }
         return AvroAdapter.nodeOf(field.schema(), rootRecord.get(field.name()), field.name());
     }

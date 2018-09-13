@@ -3,9 +3,12 @@
  */
 package com.ljcr.api.definitions;
 
+import javax.annotation.Nonnull;
+
 /**
  * Superclass of {@link TypeDefinition}
  */
+@Nonnull
 public interface PropertyDefinition {
 
     String getIdentifier();

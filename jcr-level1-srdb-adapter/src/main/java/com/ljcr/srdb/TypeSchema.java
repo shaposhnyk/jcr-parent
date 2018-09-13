@@ -25,11 +25,11 @@ public class TypeSchema extends StandardTypes.TypeDefinitionType {
     private static Map<String, PropertyDefinition> initFields(TypeDefinition fieldSchema) {
         Map<String, TypeDefinition> fields = new LinkedHashMap<>();
         fields.put("name", StandardTypes.NAME);
-        fields.put("namespace", StandardTypes.STRING);
         fields.put("doc", StandardTypes.STRING);
         fields.put("aliases", StandardTypes.arrayOf(StandardTypes.STRING));
-        fields.put("referencable", StandardTypes.BOOLEAN);
         fields.put("fields", StandardTypes.arrayOf(fieldSchema));
+        fields.put("namespace", StandardTypes.STRING);
+        fields.put("referencable", StandardTypes.BOOLEAN);
 
         Map<String, PropertyDefinition> defs = new LinkedHashMap<>();
         for (Map.Entry<String, TypeDefinition> e : fields.entrySet()) {

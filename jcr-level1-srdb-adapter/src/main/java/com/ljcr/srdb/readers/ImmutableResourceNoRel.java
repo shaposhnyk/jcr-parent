@@ -13,11 +13,11 @@ import java.util.stream.Stream;
 /**
  * Resource of no relations. Only reference is set
  */
-public class ImmutableEmptyResource implements ImmutableNode {
+public class ImmutableResourceNoRel implements ImmutableNode {
     private final Resource resource;
     private final TypeDefinition type;
 
-    public ImmutableEmptyResource(TypeDefinition type, Resource objResource) {
+    public ImmutableResourceNoRel(TypeDefinition type, Resource objResource) {
         this.type = type;
         this.resource = objResource;
     }
@@ -47,7 +47,7 @@ public class ImmutableEmptyResource implements ImmutableNode {
     }
 
     private ImmutableNode nameNodeOf(PropertyDefinition field) {
-        return new ImmutableValueNodeWrapper(field.getIdentifier(), StandardValueNodes.of(getName()));
+        return new ImmutableScalarNodeWrapper(field.getIdentifier(), StandardValueNodes.of(getName()));
     }
 
     @Override

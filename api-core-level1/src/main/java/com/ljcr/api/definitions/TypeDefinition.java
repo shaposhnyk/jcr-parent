@@ -79,6 +79,13 @@ public interface TypeDefinition {
         return Collections.emptyList();
     }
 
+    default PropertyDefinition getDeclaredFieldDefByName(String name) {
+        return getPropertyDefinitions().stream()
+                .filter(f -> name.equals(f.getIdentifier()))
+                .findFirst()
+                .orElse(null);
+    }
+
     /**
      * Returns the names of the supertypes actually declared in this node type.
      * <p>
