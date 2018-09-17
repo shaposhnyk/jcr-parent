@@ -1,6 +1,6 @@
 package com.ljcr.api.definitions;
 
-import com.ljcr.api.ImmutableScalar;
+import com.ljcr.api.ImmutableNodeScalar;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -8,7 +8,7 @@ import java.util.Objects;
 
 public final class StandardValueNodes {
 
-    public static class StandardNode<T> implements ImmutableScalar {
+    public static class StandardNode<T> implements ImmutableNodeScalar {
         private final TypeDefinition type;
 
         private final T value;
@@ -31,33 +31,33 @@ public final class StandardValueNodes {
         }
     }
 
-    public static final class StringScalarNode extends StandardNode<String> {
-        public StringScalarNode(String value) {
+    public static final class StringNodeScalarNode extends StandardNode<String> {
+        public StringNodeScalarNode(String value) {
             super(StandardTypes.STRING, value);
         }
     }
 
-    public static final class LongScalarNode extends StandardNode<Long> {
-        public LongScalarNode(Long value) {
+    public static final class LongNodeScalarNode extends StandardNode<Long> {
+        public LongNodeScalarNode(Long value) {
             super(StandardTypes.LONG, value);
         }
     }
 
-    public static final class BooleanScalarNode extends StandardNode<Boolean> {
-        public BooleanScalarNode(Boolean value) {
+    public static final class BooleanNodeScalarNode extends StandardNode<Boolean> {
+        public BooleanNodeScalarNode(Boolean value) {
             super(StandardTypes.BOOLEAN, value);
         }
     }
 
-    public static StringScalarNode of(String value) {
-        return new StringScalarNode(value);
+    public static StringNodeScalarNode of(String value) {
+        return new StringNodeScalarNode(value);
     }
 
-    public static LongScalarNode of(Long value) {
-        return new LongScalarNode(value);
+    public static LongNodeScalarNode of(Long value) {
+        return new LongNodeScalarNode(value);
     }
 
-    public static BooleanScalarNode of(Boolean value) {
-        return new BooleanScalarNode(value);
+    public static BooleanNodeScalarNode of(Boolean value) {
+        return new BooleanNodeScalarNode(value);
     }
 }

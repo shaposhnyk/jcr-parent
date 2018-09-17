@@ -15,14 +15,14 @@ import java.util.stream.Stream;
 
 public class JsonImmutableNode implements ImmutableNode {
     private final String name;
-    private final JsonImmutableScalar delegate;
+    private final JsonImmutableNodeScalar delegate;
     private final Supplier<TypeDefinition> typeSupplier;
 
-    public JsonImmutableNode(String p, JsonImmutableScalar jsonImmutableValue, TypeDefinition type) {
+    public JsonImmutableNode(String p, JsonImmutableNodeScalar jsonImmutableValue, TypeDefinition type) {
         this(p, jsonImmutableValue, () -> type);
     }
 
-    public JsonImmutableNode(String p, JsonImmutableScalar jsonImmutableValue, Supplier<TypeDefinition> typeSupplier) {
+    public JsonImmutableNode(String p, JsonImmutableNodeScalar jsonImmutableValue, Supplier<TypeDefinition> typeSupplier) {
         this.name = p;
         this.typeSupplier = typeSupplier;
         this.delegate = jsonImmutableValue;
@@ -110,17 +110,17 @@ public class JsonImmutableNode implements ImmutableNode {
     }
 
     @Override
-    public ImmutableBinaryScalar asBinaryValue() {
+    public ImmutableNodeBinary asBinaryValue() {
         return delegate.asBinaryValue();
     }
 
     @Override
-    public ImmutableObjectNode asObjectNode() {
+    public ImmutableNodeObject asObjectNode() {
         return delegate.asObjectNode();
     }
 
     @Override
-    public ImmutableArrayNode asArrayNode() {
+    public ImmutableNodeCollection asArrayNode() {
         return delegate.asArrayNode();
     }
 }

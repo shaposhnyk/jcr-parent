@@ -30,7 +30,7 @@ public class JacksonAdapterTest {
         Repository ws = JacksonAdapter.createWs("Test", json);
         ImmutableNode rootNode = ws.getRootNode();
         Assert.assertThat(rootNode.getName(), equalTo(""));
-        Assert.assertThat(rootNode.isObjectNode(), equalTo(true));
+        Assert.assertThat(rootNode.isObject(), equalTo(true));
 
         Assert.assertThat(rootNode.getItem("myFieldS"), notNullValue());
         Assert.assertThat(rootNode.getItem("myFieldS").getValue(), equalTo("myValue"));
@@ -55,8 +55,8 @@ public class JacksonAdapterTest {
 
 
         Assert.assertThat(rootNode.getName(), equalTo(""));
-        Assert.assertThat(rootNode.isArrayNode(), equalTo(false));
-        Assert.assertThat(rootNode.isObjectNode(), equalTo(true));
+        Assert.assertThat(rootNode.isCollection(), equalTo(false));
+        Assert.assertThat(rootNode.isObject(), equalTo(true));
         Assert.assertThat(rootNode.getTypeDefinition().getIdentifier(), equalTo("object"));
 
         // assert that defined field is only one - ANY

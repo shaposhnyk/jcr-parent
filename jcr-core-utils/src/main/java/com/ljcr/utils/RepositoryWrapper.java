@@ -1,7 +1,7 @@
 package com.ljcr.utils;
 
 import com.ljcr.api.ImmutableNode;
-import com.ljcr.api.ImmutableObjectNode;
+import com.ljcr.api.ImmutableNodeObject;
 import com.ljcr.api.Repository;
 import com.ljcr.api.definitions.ContainerTypeDefinition;
 import com.ljcr.api.definitions.TypeDefinition;
@@ -35,13 +35,13 @@ public class RepositoryWrapper implements Repository {
 
     @Override
     @Nullable
-    public ImmutableObjectNode getNodeByReference(TypeDefinition type, String id) throws ItemNotFoundException {
+    public ImmutableNodeObject getNodeByReference(TypeDefinition type, String id) throws ItemNotFoundException {
         return delegate.getNodeByReference(type, id);
     }
 
     @Override
     @Nullable
-    public ImmutableObjectNode getNodeByReference(String typeName, Object id) {
+    public ImmutableNodeObject getNodeByReference(String typeName, Object id) {
         return delegate.getNodeByReference(typeName, id);
     }
 

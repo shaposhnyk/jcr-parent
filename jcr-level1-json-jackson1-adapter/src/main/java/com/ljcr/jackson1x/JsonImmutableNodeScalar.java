@@ -1,9 +1,8 @@
 package com.ljcr.jackson1x;
 
-import com.ljcr.api.ImmutableArrayNode;
-import com.ljcr.api.ImmutableBinaryScalar;
-import com.ljcr.api.ImmutableObjectNode;
-import com.ljcr.api.ImmutableScalar;
+import com.ljcr.api.*;
+import com.ljcr.api.ImmutableNodeBinary;
+import com.ljcr.api.ImmutableNodeScalar;
 import com.ljcr.api.definitions.StandardTypes;
 import com.ljcr.api.definitions.TypeDefinition;
 import org.codehaus.jackson.JsonNode;
@@ -14,10 +13,10 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-public class JsonImmutableScalar implements ImmutableScalar {
+public class JsonImmutableNodeScalar implements ImmutableNodeScalar {
     private final JsonNode json;
 
-    public JsonImmutableScalar(JsonNode json) {
+    public JsonImmutableNodeScalar(JsonNode json) {
         this.json = json;
     }
 
@@ -83,17 +82,17 @@ public class JsonImmutableScalar implements ImmutableScalar {
     }
 
     @Override
-    public ImmutableBinaryScalar asBinaryValue() {
+    public ImmutableNodeBinary asBinaryValue() {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public ImmutableObjectNode asObjectNode() {
+    public ImmutableNodeObject asObjectNode() {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public ImmutableArrayNode asArrayNode() {
+    public ImmutableNodeCollection asArrayNode() {
         throw new UnsupportedOperationException();
     }
 

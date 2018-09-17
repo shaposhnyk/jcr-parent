@@ -140,9 +140,9 @@ public interface TypeDefinition {
      * Returns <code>true</code> if nodes of this type must support orderable
      * child nodes; returns <code>false</code> otherwise. If a node type returns
      * <code>true</code> on a call to this method, then all nodes of that node
-     * type <i>must</i> support the method <code>ImmutableObjectNode.orderBefore</code>. If a
+     * type <i>must</i> support the method <code>ImmutableNodeObject.orderBefore</code>. If a
      * node type returns <code>false</code> on a call to this method, then nodes
-     * of that node type <i>may</i> support <code>ImmutableObjectNode.orderBefore</code>. Only
+     * of that node type <i>may</i> support <code>ImmutableNodeObject.orderBefore</code>. Only
      * the primary node type of a node controls that node's status in this
      * regard. This setting on a mixin node type will not have any effect on the
      * node.

@@ -1,7 +1,7 @@
 package com.ljcr.dynamics;
 
 import com.ljcr.api.ImmutableNode;
-import com.ljcr.api.ImmutableObjectNode;
+import com.ljcr.api.ImmutableNodeObject;
 import com.ljcr.api.Repository;
 import com.ljcr.api.definitions.StandardTypes;
 import com.ljcr.api.definitions.TypeDefinition;
@@ -42,7 +42,7 @@ public class AvroAdapter {
         FileReader<GenericRecord> streamReader = DataFileReader.openReader(fileName, reader);
 
         GenericRecord rootRecord = streamReader.next(null); // I expect only one record
-        AvroImmutableObjectNode rootNode = new AvroImmutableObjectNode(rootRecord, "");
+        AvroImmutableNodeObject rootNode = new AvroImmutableNodeObject(rootRecord, "");
 
         Map<Schema, Collection<Path>> containers = TypeUtils.collectTypes(streamReader.getSchema(), Schema.Type.MAP);
         Map<Schema, Collection<Path>> objects = TypeUtils.collectTypes(streamReader.getSchema(), Schema.Type.RECORD);
@@ -69,7 +69,7 @@ public class AvroAdapter {
     private static TypeDefinition newTypeOf(Schema object, Map<Schema, Collection<Path>> containers, Repository rep) {
         for (Map.Entry<Schema, Collection<Path>> e : containers.entrySet()) {
             if (e.getKey().getValueType().equals(object)) {
-                List<ImmutableObjectNode> maps = e.getValue().stream()
+                List<ImmutableNodeObject> maps = e.getValue().stream()
                         .map(p -> rep.getItem(p))
                         .filter(Objects::nonNull)
                         .map(node -> node.asObjectNode())
@@ -87,17 +87,17 @@ public class AvroAdapter {
         }
 
         if (obj instanceof GenericRecord) {
-            return AvroImmutableObjectNode.of((GenericRecord) obj, fieldName);
+            return AvroImmutableNodeObject.of((GenericRecord) obj, fieldName);
         } else if (obj instanceof GenericArray<?>) {
-            return new AvroImmutableArrayNode((GenericArray) obj, fieldName);
+            return new AvroImmutableNodeCollection((GenericArray) obj, fieldName);
         } else if (obj instanceof Utf8) {
             return new AvroImmutableScalar(((Utf8) obj).toString(), fieldName, s);
         } else if (obj instanceof Map<?, ?>) {
             if (((Map) obj).isEmpty() || ((Map<?, ?>) obj).entrySet().iterator().next().getKey() instanceof String) {
-                return AvroImmutableMapNode.of((Map<String, Object>) obj, fieldName);
+                return AvroImmutableMapNodeObject.of((Map<String, Object>) obj, fieldName);
             }
 
-            return AvroImmutableMapNode.ofUtf8((Map<Utf8, Object>) obj, fieldName);
+            return AvroImmutableMapNodeObject.ofUtf8((Map<Utf8, Object>) obj, fieldName);
         }
         return new AvroImmutableScalar(obj, fieldName, s);
     }
@@ -107,7 +107,7 @@ public class AvroAdapter {
             return null;
         }
         if (obj instanceof GenericRecord) {
-            return AvroImmutableObjectNode.referencableOf((GenericRecord) obj, reference);
+            return AvroImmutableNodeObject.referencableOf((GenericRecord) obj, reference);
         }
         logger.warn("Unexpected object type. Expecting Generic Record, but was: {}", obj);
         return null;

@@ -14,7 +14,6 @@ import javax.annotation.Nullable;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Optional;
 
 /**
  * A <code>Repository</code> object represents a view onto a persitent workspace
@@ -52,7 +51,7 @@ public interface Repository {
      * referenceable and non-referenceable nodes.
      *
      * @param id An identifier.
-     * @return A <code>ImmutableObjectNode</code>.
+     * @return A <code>ImmutableNodeObject</code>.
      * @throws ItemNotFoundException if no node with the specified identifier
      *                               exists or if this <code>Session<code> does not have read access to the
      *                               node with the specified identifier.
@@ -60,7 +59,7 @@ public interface Repository {
      * @since JCR 2.0
      */
     @Nullable
-    default ImmutableObjectNode getNodeByReference(TypeDefinition type, String id) throws ItemNotFoundException {
+    default ImmutableNodeObject getNodeByReference(TypeDefinition type, String id) throws ItemNotFoundException {
         if (type instanceof ContainerTypeDefinition) {
             return ((ContainerTypeDefinition) type).findByReference(id);
         }
@@ -68,7 +67,7 @@ public interface Repository {
     }
 
     @Nullable
-    default ImmutableObjectNode getNodeByReference(String typeName, Object id) {
+    default ImmutableNodeObject getNodeByReference(String typeName, Object id) {
         if (!(id instanceof String)) {
             return null;
         }

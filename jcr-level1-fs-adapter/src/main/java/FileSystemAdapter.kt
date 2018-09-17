@@ -61,7 +61,7 @@ class FilesystemAdapter {
 
 }
 
-class FsFolder(val root: Path, val p: Path) : ImmutableObjectNode {
+class FsFolder(val root: Path, val p: Path) : ImmutableNodeObject {
     override fun getValue(): Any? = null
 
     fun getKey(): Path = p
@@ -91,7 +91,7 @@ class FsFolder(val root: Path, val p: Path) : ImmutableObjectNode {
     override fun getTypeDefinition(): TypeDefinition = FilesystemAdapter.arrayType
 }
 
-class FsFile(val root: Path, val p: Path) : ImmutableObjectNode {
+class FsFile(val root: Path, val p: Path) : ImmutableNodeObject {
     override fun getValue(): Any? = null
 
     fun getKey(): Path = p
@@ -100,7 +100,7 @@ class FsFile(val root: Path, val p: Path) : ImmutableObjectNode {
 
     override fun getItem(fieldName: String): ImmutableNode? {
         val realPath = root.resolve(Paths.get("/").relativize(p))
-        return if ("fileContent" == fieldName) GenericProperty("fileContent", p, FileContentScalar(realPath))
+        return if ("fileContent" == fieldName) GenericProperty("fileContent", p, FileContentNode(realPath))
         else GenericProperty(fieldName, p, Files.getAttribute(realPath, fieldName))
     }
 
@@ -140,7 +140,7 @@ data class GenericProperty(val fieldName: String, val p: Path, val objValue: Any
     }
 }
 
-data class FileContentScalar(val p: Path) : ImmutableBinaryScalar {
+data class FileContentNode(val p: Path) : ImmutableNodeBinary {
     override fun getTypeDefinition(): TypeDefinition = StandardTypes.BINARY;
 
     override fun asLong(): Long = throw UnsupportedRepositoryOperationException()
@@ -155,11 +155,11 @@ data class FileContentScalar(val p: Path) : ImmutableBinaryScalar {
 
     override fun asBoolean(): Boolean = throw UnsupportedRepositoryOperationException()
 
-    override fun asBinaryValue(): ImmutableBinaryScalar = this
+    override fun asBinaryValue(): ImmutableNodeBinary = this
 
-    override fun asObjectNode(): ImmutableObjectNode = throw UnsupportedRepositoryOperationException()
+    override fun asObjectNode(): ImmutableNodeObject = throw UnsupportedRepositoryOperationException()
 
-    override fun asArrayNode(): ImmutableArrayNode = throw UnsupportedRepositoryOperationException()
+    override fun asArrayNode(): ImmutableNodeCollection = throw UnsupportedRepositoryOperationException()
 
     override fun getValue(): Any = p
 

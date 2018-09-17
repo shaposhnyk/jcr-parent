@@ -1,6 +1,7 @@
 package com.ljcr.utils;
 
 import com.ljcr.api.*;
+import com.ljcr.api.definitions.PropertyDefinition;
 import com.ljcr.api.definitions.TypeDefinition;
 import com.ljcr.api.exceptions.PathNotFoundException;
 
@@ -34,25 +35,43 @@ public class ImmutableNodeWrapper implements ImmutableNode {
         return delegate.getValue();
     }
 
+    @Nullable
+    @Override
+    public Object accept(@Nonnull ImmutableItemVisitor visitor) {
+        return null;
+    }
+
+    @Nullable
+    @Override
+    public ImmutableNode getItem(@Nonnull PropertyDefinition fieldName) {
+        return delegate.getItem(fieldName);
+    }
+
     @Override
     @Nullable
     public ImmutableNode getItem(@Nonnull String fieldName) throws PathNotFoundException {
         return delegate.getItem(fieldName);
     }
 
+    @Nonnull
     @Override
-    public Stream<ImmutableNode> getItems() {
-        return delegate.getItems();
+    public Stream getElements() {
+        return null;
     }
 
     @Override
-    public boolean isObjectNode() {
-        return delegate.isObjectNode();
+    public boolean isObject() {
+        return delegate.isObject();
     }
 
     @Override
-    public boolean isArrayNode() {
-        return delegate.isArrayNode();
+    public boolean isCollection() {
+        return delegate.isCollection();
+    }
+
+    @Override
+    public boolean isScalarValue() {
+        return false;
     }
 
     @Override
@@ -61,11 +80,6 @@ public class ImmutableNodeWrapper implements ImmutableNode {
         return delegate.getTypeDefinition();
     }
 
-    @Override
-    @Nullable
-    public <T> T accept(@Nonnull ImmutableItemVisitor<T> visitor) {
-        return delegate.accept(visitor);
-    }
 
     @Override
     @Nullable
@@ -107,20 +121,5 @@ public class ImmutableNodeWrapper implements ImmutableNode {
     @Nullable
     public LocalDateTime asDateTime() {
         return delegate.asDateTime();
-    }
-
-    @Override
-    public ImmutableBinaryScalar asBinaryValue() {
-        return (ImmutableBinaryScalar) this;
-    }
-
-    @Override
-    public ImmutableObjectNode asObjectNode() {
-        return (ImmutableObjectNode) this;
-    }
-
-    @Override
-    public ImmutableArrayNode asArrayNode() {
-        return (ImmutableArrayNode) this;
     }
 }

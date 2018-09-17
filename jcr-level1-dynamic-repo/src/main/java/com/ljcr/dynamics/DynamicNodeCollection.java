@@ -1,6 +1,6 @@
 package com.ljcr.dynamics;
 
-import com.ljcr.api.ImmutableArrayNode;
+import com.ljcr.api.ImmutableNodeCollection;
 import com.ljcr.api.ImmutableItemVisitor;
 import com.ljcr.api.ImmutableNode;
 import com.ljcr.api.exceptions.PathNotFoundException;
@@ -10,10 +10,10 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.stream.Stream;
 
-public class DynamicArrayNode extends ImmutableArrayWrapper implements ImmutableArrayNode, DynamicItem {
+public class DynamicNodeCollection extends ImmutableArrayWrapper implements ImmutableNodeCollection, DynamicItem {
     private final WrappingVisitor visitor;
 
-    public DynamicArrayNode(WrappingVisitor wrappingVisitor, ImmutableArrayNode node) {
+    public DynamicNodeCollection(WrappingVisitor wrappingVisitor, ImmutableNodeCollection node) {
         super(node);
         this.visitor = wrappingVisitor;
     }

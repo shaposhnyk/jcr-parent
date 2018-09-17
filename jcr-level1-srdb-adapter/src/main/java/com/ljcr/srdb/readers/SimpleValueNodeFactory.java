@@ -1,7 +1,7 @@
 package com.ljcr.srdb.readers;
 
 import com.ljcr.api.ImmutableNode;
-import com.ljcr.api.ImmutableScalar;
+import com.ljcr.api.ImmutableNodeScalar;
 import com.ljcr.api.definitions.StandardTypeVisitor;
 import com.ljcr.api.definitions.StandardTypes;
 import com.ljcr.api.definitions.StandardValueNodes;
@@ -16,10 +16,10 @@ import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.function.Function;
 
-public class SimpleValueNodeFactory extends DelegatingVisitor<ImmutableScalar>
-        implements StandardTypeVisitor<ImmutableScalar> {
+public class SimpleValueNodeFactory extends DelegatingVisitor<ImmutableNodeScalar>
+        implements StandardTypeVisitor<ImmutableNodeScalar> {
 
-    private static final StandardTypeVisitor<ImmutableScalar> FALLBACK = newThrowingVisitor();
+    private static final StandardTypeVisitor<ImmutableNodeScalar> FALLBACK = newThrowingVisitor();
 
     public SimpleValueNodeFactory() {
         super(FALLBACK);
@@ -40,38 +40,38 @@ public class SimpleValueNodeFactory extends DelegatingVisitor<ImmutableScalar>
     }
 
     @Override
-    public ImmutableScalar visit(StandardTypes.StringType type, Object context) {
+    public ImmutableNodeScalar visit(StandardTypes.StringType type, Object context) {
         return StandardValueNodes.of((String) context);
     }
 
     @Override
-    public ImmutableScalar visit(StandardTypes.LongType type, Object context) {
+    public ImmutableNodeScalar visit(StandardTypes.LongType type, Object context) {
         return StandardValueNodes.of((Long) context);
     }
 
     @Override
-    public ImmutableScalar visit(StandardTypes.DoubleType type, Object context) {
+    public ImmutableNodeScalar visit(StandardTypes.DoubleType type, Object context) {
         return StandardValueNodes.of((Long) context);
     }
 
     @Override
-    public ImmutableScalar visit(StandardTypes.BooleanType type, Object context) {
+    public ImmutableNodeScalar visit(StandardTypes.BooleanType type, Object context) {
         return StandardValueNodes.of((Long) context);
     }
 
     @Override
-    public ImmutableScalar visit(StandardTypes.IdentifierType type, Object context) {
+    public ImmutableNodeScalar visit(StandardTypes.IdentifierType type, Object context) {
         return StandardValueNodes.of((String) context);
     }
 
     @Override
-    public ImmutableScalar visit(StandardTypes.TypeDefinitionType type, Object context) {
-        return (ImmutableScalar) context;
+    public ImmutableNodeScalar visit(StandardTypes.TypeDefinitionType type, Object context) {
+        return (ImmutableNodeScalar) context;
     }
 
     @Override
-    public ImmutableScalar visit(StandardTypes.ArrayType type, Object context) {
-        return new ImmutableScalar() {
+    public ImmutableNodeScalar visit(StandardTypes.ArrayType type, Object context) {
+        return new ImmutableNodeScalar() {
             @Nullable
             @Override
             public Collection<ImmutableNode> getValue() {

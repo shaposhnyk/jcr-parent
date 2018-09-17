@@ -10,11 +10,11 @@ import javax.annotation.Nullable;
 
 /**
  * A generic holder for the value of a repository item.
- * A <code>ImmutableScalar</code> object can
+ * A <code>ImmutableNodeScalar</code> object can
  * be used without knowing the actual property type (<code>STRING</code>,
  * <code>DOUBLE</code>, <code>BINARY</code> etc.).
  * <p>
- * The equality comparison must not change the state of the <code>ImmutableScalar</code> instances.
+ * The equality comparison must not change the state of the <code>ImmutableNodeScalar</code> instances.
  */
 @Nonnull
 public interface ImmutableCoreScalar {

@@ -56,5 +56,10 @@
             <version>${spring-boot-version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.ljcr.api</groupId>
+            <artifactId>jcr-core-utils</artifactId>
+            <version>0.1.0-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 </project>

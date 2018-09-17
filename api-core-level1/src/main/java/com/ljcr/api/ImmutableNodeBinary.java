@@ -10,16 +10,16 @@ import javax.annotation.Nullable;
 import java.io.InputStream;
 
 /**
- * A <code>ImmutableBinaryScalar</code> object holds a JCR property value of type
- * <code>BINARY</code>. The <code>ImmutableBinaryScalar</code> interface and the related
- * methods in {@link ImmutableProperty}, {@link ImmutableScalar} and {@link ValueFactory} replace
- * the deprecated {@link ImmutableScalar#getStream} and {@link ImmutableProperty#getStream}
+ * A <code>ImmutableNodeBinary</code> object holds a JCR property value of type
+ * <code>BINARY</code>. The <code>ImmutableNodeBinary</code> interface and the related
+ * methods in {@link ImmutableProperty}, {@link ImmutableNodeScalar} and {@link ValueFactory} replace
+ * the deprecated {@link ImmutableNodeScalar#getStream} and {@link ImmutableProperty#getStream}
  * methods.
  *
  * @since JCR 2.0
  */
 @Nonnull
-public interface ImmutableBinaryScalar extends ImmutableScalar {
+public interface ImmutableNodeBinary extends ImmutableNodeScalar {
 
     /**
      * Implementation specific

@@ -84,7 +84,7 @@ interface Session {
      * Returns the root node of the workspace, "/". This node is the main access
      * point to the content of the workspace.
      *
-     * @return The root node of the workspace: a <code>{@link ImmutableObjectNode}</code>
+     * @return The root node of the workspace: a <code>{@link ImmutableNodeObject}</code>
      * object.
      * @throws RepositoryException if an error occurs.
      */
@@ -164,7 +164,7 @@ interface Session {
      */
     default boolean nodeExists(@Nonnull Path absPath) {
         ImmutableNode item = getItem(absPath);
-        return item != null && item.isObjectNode();
+        return item != null && item.isObject();
     }
 
     /**

@@ -2,7 +2,7 @@ package com.ljcr.dynamics;
 
 import com.ljcr.api.ImmutableItemVisitor;
 import com.ljcr.api.ImmutableNode;
-import com.ljcr.api.ImmutableObjectNode;
+import com.ljcr.api.ImmutableNodeObject;
 import com.ljcr.api.definitions.TypeDefinition;
 import com.ljcr.api.exceptions.PathNotFoundException;
 import org.apache.avro.Schema;
@@ -12,21 +12,21 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.stream.Stream;
 
-class AvroImmutableObjectNode implements ImmutableObjectNode {
+class AvroImmutableNodeObject implements ImmutableNodeObject {
     private final GenericRecord rootRecord;
     private final String name;
 
-    AvroImmutableObjectNode(GenericRecord rootRecord, String path) {
+    AvroImmutableNodeObject(GenericRecord rootRecord, String path) {
         this.rootRecord = rootRecord;
         this.name = path;
     }
 
-    public static AvroImmutableObjectNode of(GenericRecord record, String fieldName) {
-        return new AvroImmutableObjectNode(record, fieldName);
+    public static AvroImmutableNodeObject of(GenericRecord record, String fieldName) {
+        return new AvroImmutableNodeObject(record, fieldName);
     }
 
-    public static AvroImmutableObjectNode referencableOf(GenericRecord record, String reference) {
-        return new AvroImmutableObjectNode(record, reference) {
+    public static AvroImmutableNodeObject referencableOf(GenericRecord record, String reference) {
+        return new AvroImmutableNodeObject(record, reference) {
             @Override
             public String getReference() {
                 return getName();
@@ -97,8 +97,8 @@ class AvroImmutableObjectNode implements ImmutableObjectNode {
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
-        } else if (obj instanceof AvroImmutableObjectNode) {
-            return rootRecord.equals(((AvroImmutableObjectNode) obj).rootRecord);
+        } else if (obj instanceof AvroImmutableNodeObject) {
+            return rootRecord.equals(((AvroImmutableNodeObject) obj).rootRecord);
         }
 
         return false;

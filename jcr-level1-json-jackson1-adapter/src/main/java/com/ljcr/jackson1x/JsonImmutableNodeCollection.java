@@ -1,6 +1,6 @@
 package com.ljcr.jackson1x;
 
-import com.ljcr.api.ImmutableArrayNode;
+import com.ljcr.api.ImmutableNodeCollection;
 import com.ljcr.api.ImmutableItemVisitor;
 import com.ljcr.api.ImmutableNode;
 import com.ljcr.api.definitions.TypeDefinition;
@@ -16,8 +16,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-public class JsonImmutableArrayNode extends JsonImmutableNode implements ImmutableArrayNode {
-    public JsonImmutableArrayNode(String p, JsonImmutableScalar jsonImmutableValue, TypeDefinition type) {
+public class JsonImmutableNodeCollection extends JsonImmutableNode implements ImmutableNodeCollection {
+    public JsonImmutableNodeCollection(String p, JsonImmutableNodeScalar jsonImmutableValue, TypeDefinition type) {
         super(p, jsonImmutableValue, type);
     }
 
@@ -47,7 +47,7 @@ public class JsonImmutableArrayNode extends JsonImmutableNode implements Immutab
     }
 
     @Override
-    public ImmutableArrayNode asArrayNode() {
+    public ImmutableNodeCollection asArrayNode() {
         return this;
     }
 }

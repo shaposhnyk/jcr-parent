@@ -3,7 +3,7 @@
  */
 package com.ljcr.api.definitions;
 
-import com.ljcr.api.ImmutableObjectNode;
+import com.ljcr.api.ImmutableNodeObject;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -26,7 +26,7 @@ import java.util.stream.Stream;
 @Nonnull
 public interface ContainerTypeDefinition extends TypeDefinition {
     @Nullable
-    ImmutableObjectNode findByReference(String id);
+    ImmutableNodeObject findByReference(String id);
 
-    Stream<ImmutableObjectNode> getItems();
+    Stream<ImmutableNodeObject> getItems();
 }

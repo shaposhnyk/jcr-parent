@@ -2,7 +2,7 @@ package com.ljcr.jackson1x;
 
 import com.ljcr.api.ImmutableItemVisitor;
 import com.ljcr.api.ImmutableNode;
-import com.ljcr.api.ImmutableObjectNode;
+import com.ljcr.api.ImmutableNodeObject;
 import com.ljcr.api.definitions.TypeDefinition;
 import com.ljcr.api.exceptions.PathNotFoundException;
 import org.codehaus.jackson.JsonNode;
@@ -14,8 +14,8 @@ import java.util.Spliterators;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-public class JsonImmutableObjectNode extends JsonImmutableNode implements ImmutableObjectNode {
-    public JsonImmutableObjectNode(String p, JsonImmutableScalar jsonImmutableValue, TypeDefinition type) {
+public class JsonImmutableNodeObject extends JsonImmutableNode implements ImmutableNodeObject {
+    public JsonImmutableNodeObject(String p, JsonImmutableNodeScalar jsonImmutableValue, TypeDefinition type) {
         super(p, jsonImmutableValue, type);
     }
 
@@ -26,12 +26,12 @@ public class JsonImmutableObjectNode extends JsonImmutableNode implements Immuta
     }
 
     @Override
-    public boolean isObjectNode() {
+    public boolean isObject() {
         return true;
     }
 
     @Override
-    public boolean isArrayNode() {
+    public boolean isCollection() {
         return false;
     }
 
@@ -56,7 +56,7 @@ public class JsonImmutableObjectNode extends JsonImmutableNode implements Immuta
     }
 
     @Override
-    public ImmutableObjectNode asObjectNode() {
+    public ImmutableNodeObject asObjectNode() {
         return this;
     }
 }

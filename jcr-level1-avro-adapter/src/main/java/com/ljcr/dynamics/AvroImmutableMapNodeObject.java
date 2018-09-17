@@ -2,7 +2,7 @@ package com.ljcr.dynamics;
 
 import com.ljcr.api.ImmutableItemVisitor;
 import com.ljcr.api.ImmutableNode;
-import com.ljcr.api.ImmutableObjectNode;
+import com.ljcr.api.ImmutableNodeObject;
 import com.ljcr.api.definitions.StandardTypes;
 import com.ljcr.api.definitions.TypeDefinition;
 import com.ljcr.api.exceptions.PathNotFoundException;
@@ -13,17 +13,17 @@ import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.stream.Stream;
 
-public abstract class AvroImmutableMapNode<T extends CharSequence> implements ImmutableObjectNode {
+public abstract class AvroImmutableMapNodeObject<T extends CharSequence> implements ImmutableNodeObject {
     private final String name;
     private final Map<T, Object> map;
 
-    AvroImmutableMapNode(Map<T, Object> map, String path) {
+    AvroImmutableMapNodeObject(Map<T, Object> map, String path) {
         this.map = map;
         this.name = path;
     }
 
-    public static AvroImmutableMapNode<String> of(Map<String, Object> map, String name) {
-        return new AvroImmutableMapNode<String>(map, name) {
+    public static AvroImmutableMapNodeObject<String> of(Map<String, Object> map, String name) {
+        return new AvroImmutableMapNodeObject<String>(map, name) {
             @Override
             public String getReference() {
                 return "";
@@ -44,8 +44,8 @@ public abstract class AvroImmutableMapNode<T extends CharSequence> implements Im
         };
     }
 
-    public static AvroImmutableMapNode<Utf8> ofUtf8(Map<Utf8, Object> map, String name) {
-        return new AvroImmutableMapNode<Utf8>(map, name) {
+    public static AvroImmutableMapNodeObject<Utf8> ofUtf8(Map<Utf8, Object> map, String name) {
+        return new AvroImmutableMapNodeObject<Utf8>(map, name) {
             @Override
             public String getReference() {
                 return "";
@@ -99,8 +99,8 @@ public abstract class AvroImmutableMapNode<T extends CharSequence> implements Im
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
-        } else if (obj instanceof AvroImmutableMapNode) {
-            return map.equals(((AvroImmutableMapNode) obj).map);
+        } else if (obj instanceof AvroImmutableMapNodeObject) {
+            return map.equals(((AvroImmutableMapNodeObject) obj).map);
         }
 
         return false;

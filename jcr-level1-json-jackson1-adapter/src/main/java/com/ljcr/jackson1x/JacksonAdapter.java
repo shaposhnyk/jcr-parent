@@ -16,7 +16,7 @@ import java.util.List;
 
 public class JacksonAdapter {
     private static final JsonNode jsonNull = new ObjectMapper().getNodeFactory().nullNode();
-    private static final JsonImmutableScalar JSON_IMMUTABLE_NULL = new JsonImmutableScalar(jsonNull) {
+    private static final JsonImmutableNodeScalar JSON_IMMUTABLE_NULL = new JsonImmutableNodeScalar(jsonNull) {
         @Nullable
         @Override
         public Object getValue() {
@@ -59,11 +59,11 @@ public class JacksonAdapter {
         if (json == null || json.isNull()) {
             return new JsonImmutableNode(name, JSON_IMMUTABLE_NULL, StandardTypes.ANYTYPE);
         } else if (json.isObject()) {
-            return new JsonImmutableObjectNode(name, new JsonImmutableScalar(json), objectType);
+            return new JsonImmutableNodeObject(name, new JsonImmutableNodeScalar(json), objectType);
         } else if (json.isArray()) {
-            return new JsonImmutableArrayNode(name, new JsonImmutableScalar(json), arrayType);
+            return new JsonImmutableNodeCollection(name, new JsonImmutableNodeScalar(json), arrayType);
         }
-        return new JsonImmutableNode(name, new JsonImmutableScalar(json), () -> typeOf(json));
+        return new JsonImmutableNode(name, new JsonImmutableNodeScalar(json), () -> typeOf(json));
     }
 
     public static Repository createWs(String name, JsonNode json) {

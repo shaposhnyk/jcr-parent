@@ -2,7 +2,7 @@ package com.ljcr.dynamics;
 
 import com.ljcr.api.ImmutableItemVisitor;
 import com.ljcr.api.ImmutableNode;
-import com.ljcr.api.ImmutableScalar;
+import com.ljcr.api.ImmutableNodeScalar;
 import com.ljcr.api.definitions.TypeDefinition;
 import com.ljcr.api.exceptions.PathNotFoundException;
 import org.apache.avro.Schema;
@@ -79,8 +79,8 @@ public class AvroImmutableScalar implements ImmutableNode {
             return true;
         } else if (value == null || obj == null) {
             return false;
-        } else if (obj instanceof ImmutableScalar) {
-            return getValue().equals(((ImmutableScalar) obj).getValue());
+        } else if (obj instanceof ImmutableNodeScalar) {
+            return getValue().equals(((ImmutableNodeScalar) obj).getValue());
         }
         return false;
     }

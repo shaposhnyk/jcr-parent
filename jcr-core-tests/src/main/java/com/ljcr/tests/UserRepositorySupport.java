@@ -1,12 +1,15 @@
 package com.ljcr.tests;
 
-import com.ljcr.api.ImmutableArrayNode;
+import com.ljcr.api.ImmutableNodeCollection;
 import com.ljcr.api.ImmutableNode;
 import com.ljcr.api.Repository;
 import com.ljcr.api.definitions.StandardTypes;
 import org.junit.Test;
 
 import java.nio.file.Paths;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.CoreMatchers.*;
@@ -47,8 +50,8 @@ public abstract class UserRepositorySupport {
 
         ImmutableNode usr = ws.getRootNode();
         assertThat(usr.getName(), equalTo(""));
-        assertThat(usr.isObjectNode(), equalTo(Boolean.TRUE));
-        assertThat(usr.isArrayNode(), equalTo(Boolean.FALSE));
+        assertThat(usr.isObject(), equalTo(Boolean.TRUE));
+        assertThat(usr.isCollection(), equalTo(Boolean.FALSE));
 
         assertThat(usr.getItem("id").asLong(), equalTo(10L));
         assertThat(usr.getItem("username").getValue(), equalTo("myuser"));
@@ -90,8 +93,28 @@ public abstract class UserRepositorySupport {
         assertThat(usr.getItem("username").getTypeDefinition(), equalTo(StandardTypes.STRING));
         assertThat(usr.getItem("passwordHash").getTypeDefinition(), equalTo(StandardTypes.STRING));
         assertThat(usr.getItem("signupDate").getTypeDefinition(), equalTo(StandardTypes.LONG));
-        assertThat(usr.getItem("emailAddresses").isArrayNode(), equalTo(Boolean.TRUE));
+        assertThat(usr.getItem("emailAddresses").isCollection(), equalTo(Boolean.TRUE));
     }
+
+    interface X<T> {
+        Stream<? super T> getItems();
+    }
+
+    private X getX() {
+        return null;
+    }
+
+    @Test
+    public void testEmailValues2() {
+        X x = getX();
+        Stream items = x.getItems();
+        Object collect = items.collect(Collectors.toList());
+
+        Stream y = Stream.of("X");
+        Object l = y.collect(toList());
+
+    }
+
 
     @Test
     public void testEmailValues() {
@@ -99,8 +122,9 @@ public abstract class UserRepositorySupport {
 
         assertThat(ws.getName(), equalTo("User"));
 
-        ImmutableArrayNode emails = ws.getRootNode().getItem("emailAddresses").asArrayNode();
-        assertThat(emails.getElements().collect(toList()).size(), equalTo(2));
+        ImmutableNodeCollection emails = ws.getRootNode().getItem("emailAddresses").asArrayNode();
+        List<ImmutableNode> items = emails.getElements().collect(toList());
+        assertThat(items.size(), equalTo(2));
 
         ImmutableNode item1 = emails.getItem("1");
         assertThat(item1.getItem("verified").getValue(), equalTo(Boolean.FALSE));
@@ -120,7 +144,7 @@ public abstract class UserRepositorySupport {
         assertThat(ws.getName(), equalTo("User"));
 
         ImmutableNode rootNode = ws.getRootNode();
-        ImmutableArrayNode emails = rootNode.getItem("emailAddresses").asArrayNode();
+        ImmutableNodeCollection emails = rootNode.getItem("emailAddresses").asArrayNode();
         assertThat(emails.getElements().collect(toList()).size(), equalTo(2));
 
         ImmutableNode item2 = emails.getItem("2");

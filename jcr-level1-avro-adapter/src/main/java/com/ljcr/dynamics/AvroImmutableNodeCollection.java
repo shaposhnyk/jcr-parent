@@ -1,6 +1,6 @@
 package com.ljcr.dynamics;
 
-import com.ljcr.api.ImmutableArrayNode;
+import com.ljcr.api.ImmutableNodeCollection;
 import com.ljcr.api.ImmutableItemVisitor;
 import com.ljcr.api.ImmutableNode;
 import com.ljcr.api.definitions.StandardTypes;
@@ -14,11 +14,11 @@ import javax.annotation.Nullable;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-public class AvroImmutableArrayNode implements ImmutableArrayNode {
+public class AvroImmutableNodeCollection implements ImmutableNodeCollection {
     private final String name;
     private final GenericArray<?> array;
 
-    public AvroImmutableArrayNode(GenericArray<?> array, String path) {
+    public AvroImmutableNodeCollection(GenericArray<?> array, String path) {
         this.array = array;
         this.name = path;
     }
@@ -63,8 +63,8 @@ public class AvroImmutableArrayNode implements ImmutableArrayNode {
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
-        } else if (obj instanceof AvroImmutableArrayNode) {
-            return array.equals(((AvroImmutableArrayNode) obj).array);
+        } else if (obj instanceof AvroImmutableNodeCollection) {
+            return array.equals(((AvroImmutableNodeCollection) obj).array);
         }
 
         return false;

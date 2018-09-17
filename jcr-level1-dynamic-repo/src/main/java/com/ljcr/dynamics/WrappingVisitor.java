@@ -32,7 +32,7 @@ public class WrappingVisitor implements ImmutableItemVisitor<ImmutableNode> {
         if (type.endsWith("Ref") && node.getValue() instanceof String) {
             ContainerTypeDefinition containerType = staticRepo.findContainerType(type.substring(0, type.length() - 3));
             String reference = node.asString();
-            ImmutableObjectNode referencedObj = containerType.findByReference(reference);
+            ImmutableNodeObject referencedObj = containerType.findByReference(reference);
             if (referencedObj == null) {
                 logger.warn("Unresolved reference of type {}: {}", containerType, reference);
                 return null;
@@ -44,21 +44,21 @@ public class WrappingVisitor implements ImmutableItemVisitor<ImmutableNode> {
     }
 
     @Override
-    public ImmutableObjectNode visit(@Nullable ImmutableObjectNode node) {
+    public ImmutableNodeObject visit(@Nullable ImmutableNodeObject node) {
         if (node == null || node instanceof DynamicItem) {
             return node;
         }
 
-        return new DynamicObjectNode(this, node);
+        return new DynamicNodeObject(this, node);
     }
 
     @Override
-    public ImmutableArrayNode visit(@Nullable ImmutableArrayNode node) {
+    public ImmutableNodeCollection visit(@Nullable ImmutableNodeCollection node) {
         if (node == null || node instanceof DynamicItem) {
             return node;
         }
 
-        return new DynamicArrayNode(this, node);
+        return new DynamicNodeCollection(this, node);
     }
 
     public ImmutableNode wrap(ImmutableNode node) {
