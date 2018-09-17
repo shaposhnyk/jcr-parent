@@ -26,6 +26,11 @@ import java.util.stream.Stream;
 @Nonnull
 public interface ImmutableNodeScalar extends ImmutableNode {
     @Override
+    default boolean isCollection() {
+        return false;
+    }
+
+    @Override
     default boolean isObject() {
         return false;
     }
@@ -33,11 +38,6 @@ public interface ImmutableNodeScalar extends ImmutableNode {
     @Override
     default boolean isScalarValue() {
         return true;
-    }
-
-    @Override
-    default boolean isCollection() {
-        return false;
     }
 
     @Nullable

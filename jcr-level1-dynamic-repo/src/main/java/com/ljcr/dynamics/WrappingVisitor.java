@@ -53,6 +53,15 @@ public class WrappingVisitor implements ImmutableItemVisitor<ImmutableNode> {
     }
 
     @Override
+    public ImmutableNode visit(@Nullable ImmutableNodeScalar node) {
+        if (node == null || node instanceof DynamicItem) {
+            return node;
+        }
+
+        return new DynamicNode(this, node);
+    }
+
+    @Override
     public ImmutableNodeCollection visit(@Nullable ImmutableNodeCollection node) {
         if (node == null || node instanceof DynamicItem) {
             return node;

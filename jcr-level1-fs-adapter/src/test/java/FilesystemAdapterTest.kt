@@ -11,6 +11,7 @@ import java.io.FileOutputStream
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Paths
+import kotlin.streams.toList
 
 class FilesystemAdapterTest {
 
@@ -42,7 +43,7 @@ class FilesystemAdapterTest {
         Assert.assertThat(ws.rootNode.isObject, equalTo(true))
         Assert.assertThat(ws.rootNode.typeDefinition.identifier, equalTo("directory"))
 
-        val files = ws.rootNode.items.toList()
+        val files = ws.rootNode.elements.toList()
         Assert.assertThat(files.map { f -> f.name }, hasItem(tempFile.name))
         Assert.assertThat(files.map { f -> f.name }, hasItem(tempFile2.name))
 

@@ -16,7 +16,7 @@ import java.util.List;
 
 public class JacksonAdapter {
     private static final JsonNode jsonNull = new ObjectMapper().getNodeFactory().nullNode();
-    private static final JsonImmutableNodeScalar JSON_IMMUTABLE_NULL = new JsonImmutableNodeScalar(jsonNull) {
+    private static final JsonImmutableNodeScalar JSON_IMMUTABLE_NULL = new JsonImmutableNodeScalar(jsonNull, StandardTypes.NULL) {
         @Nullable
         @Override
         public Object getValue() {
@@ -55,19 +55,19 @@ public class JacksonAdapter {
         }
     };
 
-    public static JsonImmutableNode of(String name, JsonNode json) {
+    public static ImmutableNode of(String name, JsonNode json) {
         if (json == null || json.isNull()) {
-            return new JsonImmutableNode(name, JSON_IMMUTABLE_NULL, StandardTypes.ANYTYPE);
+            return JSON_IMMUTABLE_NULL;
         } else if (json.isObject()) {
-            return new JsonImmutableNodeObject(name, new JsonImmutableNodeScalar(json), objectType);
+            return new JsonImmutableNodeObject(name, new JsonImmutableNodeScalar(json, objectType));
         } else if (json.isArray()) {
-            return new JsonImmutableNodeCollection(name, new JsonImmutableNodeScalar(json), arrayType);
+            return new JsonImmutableNodeCollection(name, new JsonImmutableNodeScalar(json, arrayType));
         }
-        return new JsonImmutableNode(name, new JsonImmutableNodeScalar(json), () -> typeOf(json));
+        return new JsonImmutableNodeScalar(json, () -> typeOf(json));
     }
 
     public static Repository createWs(String name, JsonNode json) {
-        JsonImmutableNode jsonItem = of("", json);
+        ImmutableNode jsonItem = of("", json);
 
         return new Repository() {
             @Override

@@ -37,7 +37,7 @@ public class AvroImmutableNodeCollection implements ImmutableNodeCollection {
     }
 
     @Override
-    public Stream<ImmutableNode> getItems() {
+    public Stream<ImmutableNode> getElements() {
         Schema elementType = array.getSchema().getElementType();
         return IntStream.range(0, array.size())
                 .mapToObj(i -> AvroAdapter.nodeOf(elementType, array.get(i), String.valueOf(i)));

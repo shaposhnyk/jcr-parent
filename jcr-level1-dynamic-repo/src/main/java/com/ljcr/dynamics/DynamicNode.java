@@ -23,8 +23,8 @@ public class DynamicNode extends ImmutableNodeWrapper implements ImmutableNode, 
     }
 
     @Override
-    public Stream<ImmutableNode> getItems() {
-        return super.getItems()
-                .map(visitor::wrap);
+    public Stream<ImmutableNode> getElements() {
+        return super.getElements()
+                .map(n -> visitor.wrap(n));
     }
 }

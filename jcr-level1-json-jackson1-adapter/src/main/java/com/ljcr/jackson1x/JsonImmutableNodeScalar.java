@@ -1,9 +1,8 @@
 package com.ljcr.jackson1x;
 
-import com.ljcr.api.*;
-import com.ljcr.api.ImmutableNodeBinary;
+import com.ljcr.api.ImmutableNodeCollection;
+import com.ljcr.api.ImmutableNodeObject;
 import com.ljcr.api.ImmutableNodeScalar;
-import com.ljcr.api.definitions.StandardTypes;
 import com.ljcr.api.definitions.TypeDefinition;
 import org.codehaus.jackson.JsonNode;
 
@@ -12,12 +11,20 @@ import javax.annotation.Nullable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Objects;
+import java.util.function.Supplier;
 
 public class JsonImmutableNodeScalar implements ImmutableNodeScalar {
     private final JsonNode json;
+    private final Supplier<TypeDefinition> typeSupplier;
 
-    public JsonImmutableNodeScalar(JsonNode json) {
+    public JsonImmutableNodeScalar(JsonNode json, Supplier<TypeDefinition> typeSupplier) {
         this.json = json;
+        this.typeSupplier = Objects.requireNonNull(typeSupplier);
+    }
+
+    public JsonImmutableNodeScalar(JsonNode json, TypeDefinition type) {
+        this(json, () -> type);
     }
 
     public JsonNode getJsonNode() {
@@ -82,11 +89,6 @@ public class JsonImmutableNodeScalar implements ImmutableNodeScalar {
     }
 
     @Override
-    public ImmutableNodeBinary asBinaryValue() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public ImmutableNodeObject asObjectNode() {
         throw new UnsupportedOperationException();
     }
@@ -99,6 +101,6 @@ public class JsonImmutableNodeScalar implements ImmutableNodeScalar {
     @Nonnull
     @Override
     public TypeDefinition getTypeDefinition() {
-        return StandardTypes.ANYTYPE;
+        return typeSupplier.get();
     }
 }

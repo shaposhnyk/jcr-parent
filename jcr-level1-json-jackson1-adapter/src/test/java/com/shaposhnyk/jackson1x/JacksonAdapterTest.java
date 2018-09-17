@@ -64,18 +64,18 @@ public class JacksonAdapterTest {
                 everyItem(equalTo(StandardTypes.UNKNOWN_PROPERTY)));
 
         // field defs
-        Assert.assertThat(rootNode.getItems().map(it -> it.getName())
+        Assert.assertThat(rootNode.getElements().map(it -> it.getName())
                 .collect(toList()), equalTo(
                 Arrays.asList("myObject")));
 
         // field defs
-        Assert.assertThat(rootNode.getItems().map(it -> it.getTypeDefinition().getIdentifier())
+        Assert.assertThat(rootNode.getElements().map(it -> it.getTypeDefinition().getIdentifier())
                 .collect(toList()), equalTo(
                 Arrays.asList("object")));
 
         Assert.assertThat(rootNode.getItem("myObject"), notNullValue());
         Assert.assertThat(rootNode.getItem("myObject").getTypeDefinition().getIdentifier(), equalTo("object"));
-        Assert.assertThat(rootNode.getItem("myObject").getItems().collect(toList()).size(), equalTo(2));
+        Assert.assertThat(rootNode.getItem("myObject").getElements().collect(toList()).size(), equalTo(2));
     }
 
 }

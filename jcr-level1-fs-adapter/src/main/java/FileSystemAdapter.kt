@@ -68,14 +68,13 @@ class FsFolder(val root: Path, val p: Path) : ImmutableNodeObject {
 
     override fun getName() = if (p.nameCount == 0) "" else p.fileName.toString()
 
-    override fun getReference(): String = p.toString()
-
-
     override fun getItem(fieldName: String): ImmutableNode? {
         return FilesystemAdapter.of(root, p.resolve(fieldName))
     }
 
-    override fun getItems(): Stream<ImmutableNode> {
+    override fun getItem(field: PropertyDefinition) = getItem(field.identifier)
+
+    override fun getElements(): Stream<ImmutableNode> {
         val realPath = if (p.nameCount == 0) root
         else root.resolve(p.relativize(Paths.get("/")))
         val list = Files.newDirectoryStream(realPath)
@@ -104,13 +103,13 @@ class FsFile(val root: Path, val p: Path) : ImmutableNodeObject {
         else GenericProperty(fieldName, p, Files.getAttribute(realPath, fieldName))
     }
 
-    override fun getItems(): Stream<ImmutableNode> {
+    override fun getItem(field: PropertyDefinition) = getItem(field.identifier)
+
+    override fun getElements(): Stream<ImmutableNode> {
         return listOf(getItem("fileContent"))
                 .filterNotNull()
                 .stream()
     }
-
-    override fun getReference(): String = p.toString()
 
     override fun <T : Any?> accept(visitor: ImmutableItemVisitor<T>): T? {
         return visitor.visit(this)
@@ -121,6 +120,12 @@ class FsFile(val root: Path, val p: Path) : ImmutableNodeObject {
 }
 
 data class GenericProperty(val fieldName: String, val p: Path, val objValue: Any) : ImmutableNode {
+    override fun isObject(): Boolean = false;
+
+    override fun isCollection(): Boolean = false;
+
+    override fun isScalarValue(): Boolean = true;
+
     fun getKey(): Path = p.resolve(fieldName)
 
     override fun getName(): String = fieldName
@@ -131,7 +136,9 @@ data class GenericProperty(val fieldName: String, val p: Path, val objValue: Any
 
     override fun getItem(fieldName: String): ImmutableNode? = null
 
-    override fun getItems(): Stream<ImmutableNode> = Stream.empty()
+    override fun getItem(fieldName: PropertyDefinition) = getItem(fieldName.identifier)
+
+    override fun getElements(): Stream<ImmutableNode> = Stream.empty()
 
     override fun getTypeDefinition(): TypeDefinition = StandardTypes.ANYTYPE
 
@@ -140,7 +147,7 @@ data class GenericProperty(val fieldName: String, val p: Path, val objValue: Any
     }
 }
 
-data class FileContentNode(val p: Path) : ImmutableNodeBinary {
+data class FileContentNode(val p: Path) : ImmutableNodeScalar {
     override fun getTypeDefinition(): TypeDefinition = StandardTypes.BINARY;
 
     override fun asLong(): Long = throw UnsupportedRepositoryOperationException()
@@ -155,17 +162,13 @@ data class FileContentNode(val p: Path) : ImmutableNodeBinary {
 
     override fun asBoolean(): Boolean = throw UnsupportedRepositoryOperationException()
 
-    override fun asBinaryValue(): ImmutableNodeBinary = this
-
     override fun asObjectNode(): ImmutableNodeObject = throw UnsupportedRepositoryOperationException()
 
     override fun asArrayNode(): ImmutableNodeCollection = throw UnsupportedRepositoryOperationException()
 
     override fun getValue(): Any = p
 
-    override fun size(): Long = Files.size(p)
-
-    override fun newInputStream(): InputStream {
+    fun newInputStream(): InputStream {
         return Files.newInputStream(p)
     }
 

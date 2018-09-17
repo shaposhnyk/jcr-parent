@@ -3,6 +3,7 @@ package com.ljcr.jackson1x;
 import com.ljcr.api.ImmutableItemVisitor;
 import com.ljcr.api.ImmutableNode;
 import com.ljcr.api.ImmutableNodeObject;
+import com.ljcr.api.definitions.PropertyDefinition;
 import com.ljcr.api.definitions.TypeDefinition;
 import com.ljcr.api.exceptions.PathNotFoundException;
 import org.codehaus.jackson.JsonNode;
@@ -15,12 +16,12 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 public class JsonImmutableNodeObject extends JsonImmutableNode implements ImmutableNodeObject {
-    public JsonImmutableNodeObject(String p, JsonImmutableNodeScalar jsonImmutableValue, TypeDefinition type) {
-        super(p, jsonImmutableValue, type);
+    public JsonImmutableNodeObject(String p, JsonImmutableNodeScalar jsonImmutableValue) {
+        super(p, jsonImmutableValue);
     }
 
     @Override
-    public String getReference() {
+    public String getName() {
         ImmutableNode reference = getItem("reference");
         return reference == null ? null : reference.asString();
     }
@@ -41,8 +42,14 @@ public class JsonImmutableNodeObject extends JsonImmutableNode implements Immuta
         return JacksonAdapter.of(fieldName, getJsonNode().get(fieldName));
     }
 
+    @Nullable
     @Override
-    public Stream<ImmutableNode> getItems() {
+    public ImmutableNode getItem(@Nonnull PropertyDefinition field) throws PathNotFoundException {
+        return JacksonAdapter.of(field.getIdentifier(), getJsonNode().get(field.getIdentifier()));
+    }
+
+    @Override
+    public Stream<ImmutableNode> getElements() {
         JsonNode jsonNode = getJsonNode();
         return StreamSupport.stream(
                 Spliterators.spliteratorUnknownSize(getJsonNode().getFieldNames(), Spliterator.ORDERED), false)

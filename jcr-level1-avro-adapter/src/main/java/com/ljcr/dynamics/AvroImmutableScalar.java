@@ -10,9 +10,8 @@ import org.apache.avro.Schema;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.function.Supplier;
-import java.util.stream.Stream;
 
-public class AvroImmutableScalar implements ImmutableNode {
+public class AvroImmutableScalar implements ImmutableNodeScalar {
     private final Object value;
     private final String name;
     private final Supplier<TypeDefinition> tdSupplier;
@@ -49,11 +48,6 @@ public class AvroImmutableScalar implements ImmutableNode {
     @Override
     public ImmutableNode getItem(@Nonnull String fieldName) throws PathNotFoundException {
         throw new PathNotFoundException(fieldName);
-    }
-
-    @Override
-    public Stream<ImmutableNode> getItems() {
-        return Stream.empty();
     }
 
     @Nonnull

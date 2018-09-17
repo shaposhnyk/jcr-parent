@@ -1,6 +1,9 @@
 package com.ljcr.jackson1x;
 
-import com.ljcr.api.*;
+import com.ljcr.api.ImmutableItemVisitor;
+import com.ljcr.api.ImmutableNode;
+import com.ljcr.api.ImmutableNodeCollection;
+import com.ljcr.api.ImmutableNodeObject;
 import com.ljcr.api.definitions.TypeDefinition;
 import com.ljcr.api.exceptions.PathNotFoundException;
 import org.codehaus.jackson.JsonNode;
@@ -10,21 +13,14 @@ import javax.annotation.Nullable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-public class JsonImmutableNode implements ImmutableNode {
+public abstract class JsonImmutableNode implements ImmutableNode {
     private final String name;
     private final JsonImmutableNodeScalar delegate;
-    private final Supplier<TypeDefinition> typeSupplier;
 
-    public JsonImmutableNode(String p, JsonImmutableNodeScalar jsonImmutableValue, TypeDefinition type) {
-        this(p, jsonImmutableValue, () -> type);
-    }
-
-    public JsonImmutableNode(String p, JsonImmutableNodeScalar jsonImmutableValue, Supplier<TypeDefinition> typeSupplier) {
+    public JsonImmutableNode(String p, JsonImmutableNodeScalar jsonImmutableValue) {
         this.name = p;
-        this.typeSupplier = typeSupplier;
         this.delegate = jsonImmutableValue;
     }
 
@@ -51,14 +47,14 @@ public class JsonImmutableNode implements ImmutableNode {
     }
 
     @Override
-    public Stream<ImmutableNode> getItems() {
+    public Stream<ImmutableNode> getElements() {
         return Stream.empty();
     }
 
     @Nonnull
     @Override
     public TypeDefinition getTypeDefinition() {
-        return typeSupplier.get();
+        return delegate.getTypeDefinition();
     }
 
     @Nullable
@@ -107,11 +103,6 @@ public class JsonImmutableNode implements ImmutableNode {
     @Nullable
     public boolean asBoolean() {
         return delegate.asBoolean();
-    }
-
-    @Override
-    public ImmutableNodeBinary asBinaryValue() {
-        return delegate.asBinaryValue();
     }
 
     @Override

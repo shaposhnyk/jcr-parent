@@ -1,9 +1,8 @@
 package com.ljcr.jackson1x;
 
-import com.ljcr.api.ImmutableNodeCollection;
 import com.ljcr.api.ImmutableItemVisitor;
 import com.ljcr.api.ImmutableNode;
-import com.ljcr.api.definitions.TypeDefinition;
+import com.ljcr.api.ImmutableNodeCollection;
 import com.ljcr.api.exceptions.PathNotFoundException;
 
 import javax.annotation.Nonnull;
@@ -17,13 +16,13 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 public class JsonImmutableNodeCollection extends JsonImmutableNode implements ImmutableNodeCollection {
-    public JsonImmutableNodeCollection(String p, JsonImmutableNodeScalar jsonImmutableValue, TypeDefinition type) {
-        super(p, jsonImmutableValue, type);
+    public JsonImmutableNodeCollection(String p, JsonImmutableNodeScalar jsonImmutableValue) {
+        super(p, jsonImmutableValue);
     }
 
     @Override
     public Collection<ImmutableNode> getValue() {
-        return getItems().collect(Collectors.toList());
+        return getElements().collect(Collectors.toList());
     }
 
     @Nullable
@@ -33,7 +32,7 @@ public class JsonImmutableNodeCollection extends JsonImmutableNode implements Im
     }
 
     @Override
-    public Stream<ImmutableNode> getItems() {
+    public Stream<ImmutableNode> getElements() {
         final AtomicInteger counter = new AtomicInteger(1);
         return StreamSupport.stream(
                 Spliterators.spliteratorUnknownSize(getJsonNode().getElements(), Spliterator.ORDERED), false)

@@ -1,7 +1,6 @@
 package com.ljcr.jackson1x;
 
 import com.ljcr.api.ImmutableNodeCollection;
-import com.ljcr.api.ImmutableNodeBinary;
 import com.ljcr.api.ImmutableNodeObject;
 import com.ljcr.api.ImmutableNodeScalar;
 import com.ljcr.api.definitions.StandardTypes;
@@ -65,11 +64,6 @@ public class JsonImmutableNodeNull implements ImmutableNodeScalar {
     @Override
     public boolean asBoolean() {
         return false;
-    }
-
-    @Override
-    public ImmutableNodeBinary asBinaryValue() {
-        return null;
     }
 
     @Override

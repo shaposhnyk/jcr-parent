@@ -3,9 +3,9 @@ package com.ljcr.dynamics;
 import com.ljcr.api.ImmutableItemVisitor;
 import com.ljcr.api.ImmutableNode;
 import com.ljcr.api.ImmutableNodeObject;
+import com.ljcr.api.definitions.PropertyDefinition;
 import com.ljcr.api.definitions.StandardTypes;
 import com.ljcr.api.definitions.TypeDefinition;
-import com.ljcr.api.exceptions.PathNotFoundException;
 import org.apache.avro.util.Utf8;
 
 import javax.annotation.Nonnull;
@@ -24,14 +24,10 @@ public abstract class AvroImmutableMapNodeObject<T extends CharSequence> impleme
 
     public static AvroImmutableMapNodeObject<String> of(Map<String, Object> map, String name) {
         return new AvroImmutableMapNodeObject<String>(map, name) {
-            @Override
-            public String getReference() {
-                return "";
-            }
-
             @Nullable
             @Override
-            public ImmutableNode getItem(@Nonnull String fieldName) throws PathNotFoundException {
+            public ImmutableNode getItem(@Nonnull PropertyDefinition field) {
+                String fieldName = field.getIdentifier();
                 Object value = map.get(fieldName);
                 return AvroAdapter.referencableNodeOf(value, fieldName);
             }
@@ -46,14 +42,10 @@ public abstract class AvroImmutableMapNodeObject<T extends CharSequence> impleme
 
     public static AvroImmutableMapNodeObject<Utf8> ofUtf8(Map<Utf8, Object> map, String name) {
         return new AvroImmutableMapNodeObject<Utf8>(map, name) {
-            @Override
-            public String getReference() {
-                return "";
-            }
-
             @Nullable
             @Override
-            public ImmutableNode getItem(@Nonnull String fieldName) throws PathNotFoundException {
+            public ImmutableNode getItem(@Nonnull PropertyDefinition field) {
+                String fieldName = field.getIdentifier();
                 Utf8 key = new Utf8(fieldName);
                 Object value = map.get(key);
                 return AvroAdapter.referencableNodeOf(value, fieldName);
@@ -74,7 +66,7 @@ public abstract class AvroImmutableMapNodeObject<T extends CharSequence> impleme
     }
 
     @Override
-    public Stream<ImmutableNode> getItems() {
+    public Stream<ImmutableNode> getElements() {
         return map.entrySet().stream()
                 .map(e -> AvroAdapter.referencableNodeOf(e.getValue(), e.getKey().toString()));
     }

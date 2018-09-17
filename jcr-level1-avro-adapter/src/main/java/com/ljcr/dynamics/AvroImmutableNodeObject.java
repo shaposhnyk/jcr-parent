@@ -3,6 +3,7 @@ package com.ljcr.dynamics;
 import com.ljcr.api.ImmutableItemVisitor;
 import com.ljcr.api.ImmutableNode;
 import com.ljcr.api.ImmutableNodeObject;
+import com.ljcr.api.definitions.PropertyDefinition;
 import com.ljcr.api.definitions.TypeDefinition;
 import com.ljcr.api.exceptions.PathNotFoundException;
 import org.apache.avro.Schema;
@@ -28,16 +29,10 @@ class AvroImmutableNodeObject implements ImmutableNodeObject {
     public static AvroImmutableNodeObject referencableOf(GenericRecord record, String reference) {
         return new AvroImmutableNodeObject(record, reference) {
             @Override
-            public String getReference() {
+            public String getName() {
                 return getName();
             }
         };
-    }
-
-    @Override
-    public String getReference() {
-        Object reference = rootRecord.get("reference");
-        return reference instanceof String ? (String) reference : null;
     }
 
     @Nonnull
@@ -52,13 +47,14 @@ class AvroImmutableNodeObject implements ImmutableNodeObject {
     }
 
     @Nullable
-    public ImmutableNode getItem(@Nonnull String fieldName) throws PathNotFoundException {
-        Schema.Field field = rootRecord.getSchema().getField(fieldName);
+    public ImmutableNode getItem(@Nonnull PropertyDefinition field) {
+        String fieldName = field.getIdentifier();
+        Schema.Field sField = rootRecord.getSchema().getField(fieldName);
         if (field == null) {
             throw new PathNotFoundException("./" + fieldName);
         }
 
-        return nodeOf(field, rootRecord);
+        return nodeOf(sField, rootRecord);
     }
 
     private ImmutableNode nodeOf(Schema.Field field, GenericRecord rootRecord) {
@@ -72,7 +68,8 @@ class AvroImmutableNodeObject implements ImmutableNodeObject {
         return AvroAdapter.nodeOf(field.schema(), rootRecord.get(field.name()), field.name());
     }
 
-    public Stream<ImmutableNode> getItems() {
+    @Override
+    public Stream<ImmutableNode> getElements() {
         return rootRecord.getSchema().getFields().stream()
                 .map(f -> nodeOf(f, rootRecord));
     }

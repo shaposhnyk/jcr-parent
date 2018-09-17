@@ -30,8 +30,8 @@ public class AvroContainerTypeDefinition extends AvroTypeDefinition implements C
     @Override
     public Stream<ImmutableNodeObject> getItems() {
         return containers.stream()
-                .flatMap(c -> c.getItems())
-                .filter(o -> o != null && o.isObjectNode())
+                .flatMap(c -> c.getElements())
+                .filter(o -> o != null && o.isObject())
                 .map(o -> o.asObjectNode());
     }
 }

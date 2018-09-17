@@ -23,22 +23,22 @@ public class ImmutableNodeWrapper implements ImmutableNode {
         return delegate;
     }
 
+    @Nullable
+    @Override
+    public Object getValue() {
+        return delegate.getValue();
+    }
+
     @Override
     @Nonnull
     public String getName() {
         return delegate.getName();
     }
 
-    @Override
-    @Nullable
-    public Object getValue() {
-        return delegate.getValue();
-    }
-
     @Nullable
     @Override
-    public Object accept(@Nonnull ImmutableItemVisitor visitor) {
-        return null;
+    public <U> U accept(@Nonnull ImmutableItemVisitor<U> visitor) {
+        return visitor.visit(this);
     }
 
     @Nullable
@@ -55,8 +55,8 @@ public class ImmutableNodeWrapper implements ImmutableNode {
 
     @Nonnull
     @Override
-    public Stream getElements() {
-        return null;
+    public Stream<ImmutableNode> getElements() {
+        return delegate.getElements();
     }
 
     @Override

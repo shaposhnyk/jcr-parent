@@ -65,7 +65,7 @@ public class AvroAdapterTest extends UserRepositorySupport {
         ImmutableNode fb = identities.getItem("facebook");
         assertThat(fb, notNullValue());
         assertThat(fb.getItem("secretId").getValue(), equalTo("some@one.com"));
-        assertThat(identities.getItems()
+        assertThat(identities.getElements()
                 .map(i -> i.getName())
                 .collect(toList()), hasItems("facebook", "google", "microsoft", "twitter"));
     }
